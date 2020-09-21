@@ -1,2 +1,3 @@
 def get_status(variable):
-    print(variable.octoprint)
+    status = variable.octoprint.get_status()
+    
