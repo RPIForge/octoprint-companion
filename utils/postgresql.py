@@ -1,9 +1,0 @@
-
-
-def Postgres():
-    connection = None
-    
-    
-    
-    
-    
