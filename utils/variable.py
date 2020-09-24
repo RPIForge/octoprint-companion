@@ -8,9 +8,9 @@ class variable():
     storage_class = None
     logger_class = None
     
-    #pritn status
+    #print status
     status = "Offline"
-    print_id = ""
+    job_id = None
     
     def __init__(self, printer_name):
         self.name = printer_name

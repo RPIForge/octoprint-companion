@@ -1,12 +1,9 @@
-
-
 #schedule import
 import schedule
 import time
 
 #enviroment variables import
 import os
-
 
 
 #inisitalize variable
@@ -19,16 +16,16 @@ logger_instance = logger(variable_instanse)
 variable_instanse.logger_class = logger_instance
 
 
-#initialize octoprint
+#initialize octoprint companion
 from utils.octoprint import octoprint
 octoprint_instanse = octoprint(variable_instanse)
 variable_instanse.octoprint_class = octoprint_instanse
 
-#import tasks
+#import tasks and schedule tasks
 import tasks
 schedule.every(1).seconds.do(tasks.get_status, variable_instanse)
 
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+#run tasks
+#while True:
+#    schedule.run_pending()
+#    time.sleep(1)

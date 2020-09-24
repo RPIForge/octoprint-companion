@@ -42,15 +42,21 @@ class octoprint():
             return None
     
     def get_status(self):
-        return self.make_get_request("/api/job",{})
+        response = self.make_get_request("/api/job",{})
+        if("state" in response):
+            return response["state"]
+        return None
         
     
     def get_temperature(self):
-        return self.make_get_request("/api/printer/chamber",{})
+        response = self.make_get_request("/api/printer/chamber",{})
+        if("chamber" in response and "actual" in response["chamber"]):
+            return response["chamber"]["actual"]
+        return None
     
     def get_file(self):
         status = self.get_status()
-        if(not status and status['state']!="Printing"):
+        if(status and status['state']!="Printing"):
             return None
         
         status_file_info = status["job"]["file"]
