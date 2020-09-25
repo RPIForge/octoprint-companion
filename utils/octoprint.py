@@ -35,36 +35,42 @@ class octoprint():
     
     def make_get_request(self,endpoint, dictionary):
         try:
-            dictionary['X-Api-Key']=self.api_key
-            return utils.communication.get_request(self.get_url()+endpoint, dictionary)
+            headers = {'X-Api-Key':self.api_key}
+            return utils.communication.get_request(self.get_url()+endpoint, dictionary, headers)
         except ConnectionError:
             self.logger.error("Unable to reach printer")
             return None
     
     def get_status(self):
         response = self.make_get_request("/api/job",{})
-        if("state" in response):
+        if(response and "state" in response):
             return response["state"]
         return None
         
     
     def get_temperature(self):
-        response = self.make_get_request("/api/printer/chamber",{})
-        if("chamber" in response and "actual" in response["chamber"]):
-            return response["chamber"]["actual"]
+        response = self.make_get_request("/api/printer",{})
+        if(response and "temperature" in response and "tool0" in response["temperature"]):
+            return response["temperature"]["tool0"]
         return None
     
     def get_file(self):
-        status = self.get_status()
-        if(status and status['state']!="Printing"):
+        job_information = self.make_get_request("/api/job",{})
+        if(not job_information and "state" not in job_information):
             return None
         
-        status_file_info = status["job"]["file"]
+        status = job_information['state']
+            
+        if(status and status!="Printing from SD"):
+            return None
+        
+        status_file_info = job_information["job"]["file"]
         file_info = self.make_get_request("/api/files/{}/{}".format(status_file_info["origin"], status_file_info["name"]),{})
         if(not file_info):
             return None
             
-        return utils.communication.get_file(file_info["refs"]["download"], {"X-Api-Key":self.api_key})
+        print(file_info["refs"])
+        return utils.communication.get_file(file_info["refs"]["resource"], {}, {"X-Api-Key":self.api_key})
         
         
         
