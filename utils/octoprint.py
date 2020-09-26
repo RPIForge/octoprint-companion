@@ -36,7 +36,7 @@ class octoprint():
     def make_get_request(self,endpoint, dictionary):
         try:
             headers = {'X-Api-Key':self.api_key}
-            return utils.communication.get_request(self.get_url()+endpoint, dictionary, headers)
+            return utils.communication.get_json(self.get_url()+endpoint, dictionary, headers)
         except ConnectionError:
             self.logger.error("Unable to reach printer")
             return None
@@ -60,17 +60,16 @@ class octoprint():
             return None
         
         status = job_information['state']
-            
-        if(status and status!="Printing from SD"):
+        if(status and (status!="Printing from SD" and status!="Printing")):
             return None
         
         status_file_info = job_information["job"]["file"]
         file_info = self.make_get_request("/api/files/{}/{}".format(status_file_info["origin"], status_file_info["name"]),{})
         if(not file_info):
             return None
-            
-        print(file_info["refs"])
-        return utils.communication.get_file(file_info["refs"]["resource"], {}, {"X-Api-Key":self.api_key})
+         
+
+        return utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
         
         
         
