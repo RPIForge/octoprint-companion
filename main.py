@@ -21,6 +21,11 @@ from utils.octoprint import octoprint
 octoprint_instanse = octoprint(variable_instanse)
 variable_instanse.octoprint_class = octoprint_instanse
 
+#initialize storage companion
+from utils.storage import storage
+storage_instanse = storage(variable_instanse)
+variable_instanse.storage_class = storage_instanse
+
 #import tasks and schedule tasks
 import tasks
 schedule.every(1).seconds.do(tasks.get_status, variable_instanse)

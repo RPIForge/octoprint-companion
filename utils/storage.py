@@ -15,11 +15,31 @@ class postgres():
     #table information
     table = ""
     connection = None
-    cursor = None
     
     variable = None
     logger = None
-    def __init__(self, variable):
+    
+    
+    #function to create/update commands.
+    #Auto commits and closes curosr
+    def execute_create(self, command, args):
+        cursor = self.connection.cursor()
+        cursor.execute(command,args)
+        
+        #close cursor
+        cursor.close()
+        # commit the changes
+        self.connection.commit()
+    
+    #function to get data from postgres
+    #does not close cursor
+    def execute_get(self, command, args):
+        cursor = self.connection.cursor()
+        cursor.execute(command,args)
+        return cursor
+        
+    
+    def __init__(self, variable_class):
         self.variable = variable_class
         self.logger = self.variable.logger_class.logger
         
@@ -29,7 +49,7 @@ class postgres():
         
         #databse information
         database = os.getenv('POSTGRES_DB',"forge_octoprint")
-        self.table = os.getenv('POSTGRES_TABLE',"")
+        self.table =  os.getenv('POSTGRES_TABLE',"print_table") 
         
         #server location
         ip = os.getenv('POSTGRES_IP',"192.168.1.10")
@@ -44,16 +64,17 @@ class postgres():
                 user=user,
                 password=secret
             )
-            self.cursor = self.connection.cursor()
+            
         except:
             self.logger.error("Error connecting to Postgres database: {}".format(database))
+            return None
         
         #set table name
-        self.table = "print_table"
+        
         
         #see if table exists
-        self.cursor.execute("select exists(select * from information_schema.tables where table_name=%s)", (self.table,))
-        if(not self.cursor.fetchone()[0]):
+        exists = self.execute_get("select exists(select * from information_schema.tables where table_name=%s)", (self.table,))
+        if(not exists.fetchone()[0]):
             #create table if it doesnt exist
             create_command = '''CREATE TABLE %s (
                job_id SERIAL PRIMARY KEY,
@@ -63,7 +84,6 @@ class postgres():
                time_completed timestamp,
                finish_status VARCHAR(36),
                temperature_history text
-               
             );'''
             
             self.cursor.execute(create_command, (self.table,))
@@ -72,7 +92,7 @@ class postgres():
         pass
         
     def update_row(self, row_id, dictionary):
-        
+        pass
 
 class s3():
     s3_resource = None
@@ -80,7 +100,7 @@ class s3():
     
     variable = None
     logger = None
-    def __init__(self, variable):
+    def __init__(self, variable_class):
         self.variable = variable_class
         self.logger = self.variable.logger_class.logger
         
@@ -126,15 +146,15 @@ class storage():
     logger = None
     def __init__(self,variable_class):
         self.variable = variable_class
-        self.logger = self.variable.logger_class
+        self.logger = self.variable.logger_class.logger
         
         self.logger.info("Initalizing Storage Class")
         self.logger.info("Initializing s3 Class")
-        self.s3 = s3()
+        self.s3 = s3(variable_class)
         self.logger.info("Finished initializing s3 Class")
         
         self.logger.info("Initializing postgres Class")
-        self.postgresql = postgres()
+        self.postgresql = postgres(variable_class)
         self.logger.info("Finished initializing postgres Class")
     
     def start_print(self, file):
@@ -143,12 +163,15 @@ class storage():
         #upload file and get uuid
         #create row in job table
         #set job_id in variable
+        pass
         
     def finish_print(self):
         #update finished row
+        pass
     
     def send_temperature(self, temperature):
         #update row
+        pass
         
     
         
