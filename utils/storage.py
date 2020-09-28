@@ -30,10 +30,20 @@ class postgres():
         cursor = self.connection.cursor()
         cursor.execute(command,args)
         
+        #get result for cursor
+        try:
+            result = cursor.fetchone()[0]
+        except:
+            result = None
+            
+            
         #close cursor
         cursor.close()
         # commit the changes
         self.connection.commit()
+        
+        #return result if present
+        return result
     
     #function to get data from postgres
     #does not close cursor
@@ -102,7 +112,8 @@ class postgres():
         INSERT INTO {} (printer_id, file,
         start_time, time_completed,
         finish_status,  temperature_history)
-        VALUES (%s, %s, %s, %s, %s, %s);'''
+        VALUES (%s, %s, %s, %s, %s, %s) 
+        RETURNING job_id;'''
         
         row_command = sql.SQL(row_text).format(sql.Identifier(self.table))
         
@@ -111,10 +122,34 @@ class postgres():
                         file, datetime.datetime.utcnow(), None,
                         None, None)
         
-        self.execute_create(row_command,row_variables)
+        return self.execute_create(row_command,row_variables)
         
     def update_row(self, row_id, dictionary):
-        pass
+        output_text = ''
+        for key in dictionary:
+            output_text = output_text+" "+key+"="+str(dictionary[key])+","
+        output_text = output_text[:-1]
+        
+        row_text = '''UPDATE {} SET %s WHERE job_id = %s;'''
+        row_command = sql.SQL(row_text).format(sql.Identifier(self.table))
+        
+        return self.execute_create(row_command,(output_text,row_id,))
+    
+    def get_row(self, row_id):
+        row_text = ''' select * from {}
+        WHERE job_id = %s;'''
+        row_command = sql.SQL(row_text).format(sql.Identifier(self.table))
+        
+        cursor = self.execute_get(row_command, (row_id,))
+        try:
+            result = cursor.fetchone()
+        except:
+            self.logger.debug("No data found matching row")
+
+            result = None
+        
+        cursor.close()
+        return result
 
 class s3():
     s3_resource = None
@@ -180,19 +215,40 @@ class storage():
         self.logger.info("Finished initializing postgres Class")
     
     def start_print(self, file):
-        #if job_id is none then finish
+        if(job_id is not None):
+            self.logger.warn("Past job was not finished")
+            self.finish_print("Companion Error")
         
         #upload file and get uuid
-        #create row in job table
-        #set job_id in variable
-        pass
+        uuid = self.s3.upload_file(file)
         
-    def finish_print(self):
-        #update finished row
-        pass
+        #create row in job table
+        job_id = self.postgresql.create_row(uuid)
+        
+        #set job_id in variable
+        self.variable.job_id = job_id
+        
+    def finish_print(self, status):
+        self.postgresql.update_row(self.variable.job_id, {"finish_status":status,"time_completed":datetime.datetime.utcnow()})
+        self.variable.job_id = None
     
     def send_temperature(self, temperature):
+        if(self.variable.job_id is None):
+            self.logger.warn("No current job for temperature")
+            return None
         #update row
+        result = self.postgresql.get_row(self.variable.job_id)
+        
+        if(result is None):
+            self.logger.warn("No row with job_id for temperature")
+            return None
+            
+        temperature_history = result[6]
+        new_temperature_history = "{}:{},{}".format(temperature_history, datetime.datetime.utcnow(), temperature)
+        self.postgresql.update_row(self.variable.job_id, {"temperature_history":new_temperature_history})
+        
+        
+        
         pass
         
     
