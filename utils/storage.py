@@ -6,9 +6,13 @@ import boto3
 
 #postgres import
 import psycopg2
+from psycopg2 import sql
 
 #random string creation
 import uuid
+
+#current time 
+import datetime
 
 
 class postgres():
@@ -44,8 +48,8 @@ class postgres():
         self.logger = self.variable.logger_class.logger
         
         #user information
-        user = os.getenv('POSTGRES_USER',"")
-        secret = os.getenv('POSTGRES_SECRET',"")
+        user = os.getenv('POSTGRES_USER',"postgres")
+        secret = os.getenv('POSTGRES_SECRET',"password")
         
         #databse information
         database = os.getenv('POSTGRES_DB',"forge_octoprint")
@@ -73,10 +77,12 @@ class postgres():
         
         
         #see if table exists
-        exists = self.execute_get("select exists(select * from information_schema.tables where table_name=%s)", (self.table,))
-        if(not exists.fetchone()[0]):
+        exists_cursor = self.execute_get("select exists(select * from information_schema.tables where table_name=%s)", (self.table,))
+        exists = exists_cursor.fetchone()[0]
+        exists_cursor.close()
+        if(not exists):
             #create table if it doesnt exist
-            create_command = '''CREATE TABLE %s (
+            create_text = '''CREATE TABLE {} (
                job_id SERIAL PRIMARY KEY,
                printer_id integer,
                file VARCHAR(36),
@@ -86,10 +92,26 @@ class postgres():
                temperature_history text
             );'''
             
-            self.cursor.execute(create_command, (self.table,))
+            create_command = sql.SQL(create_text).format(sql.Identifier(self.table))
+            
+            self.execute_create(create_command)
         
-    def create_row(self, dictionary):
-        pass
+        
+    def create_row(self, file):
+        row_text = '''
+        INSERT INTO {} (printer_id, file,
+        start_time, time_completed,
+        finish_status,  temperature_history)
+        VALUES (%s, %s, %s, %s, %s, %s);'''
+        
+        row_command = sql.SQL(row_text).format(sql.Identifier(self.table))
+        
+        
+        row_variables = (self.variable.printer_id, 
+                        file, datetime.datetime.utcnow(), None,
+                        None, None)
+        
+        self.execute_create(row_command,row_variables)
         
     def update_row(self, row_id, dictionary):
         pass

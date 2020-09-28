@@ -8,7 +8,7 @@ import os
 
 #inisitalize variable
 from utils.variable import variable
-variable_instanse = variable(os.getenv('NAME',"generic_test"))
+variable_instanse = variable()
 
 #initialize logging
 from utils.logging import logger
