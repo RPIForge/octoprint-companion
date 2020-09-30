@@ -8,7 +8,7 @@ class variable():
     
     #util classes
     octoprint_class = None
-    storage_class = None
+    s3_class = None
     logger_class = None
     
     #print status

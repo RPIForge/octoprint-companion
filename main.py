@@ -22,9 +22,9 @@ octoprint_instanse = octoprint(variable_instanse)
 variable_instanse.octoprint_class = octoprint_instanse
 
 #initialize storage companion
-from utils.storage import storage
-storage_instanse = storage(variable_instanse)
-variable_instanse.storage_class = storage_instanse
+from utils.storage import s3
+s3_instanse = s3(variable_instanse)
+variable_instanse.s3_class = s3_instanse
 
 #import tasks and schedule tasks
 import tasks
