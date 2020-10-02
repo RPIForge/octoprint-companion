@@ -46,7 +46,8 @@ class website():
     def send_status(self, status):
         response_status = {
             "machine_id": self.variable.printer_id,
-            "status": status
+            "status": status,
+            
         }
         
         return self.make_post_request('/api/machines/status', response_status, None)
@@ -56,9 +57,10 @@ class website():
     ##{
     ##  "completion":completion_time
     ##}
-    def send_print_information(self, completion_time):
+    def send_print_information(self, completion_time, file_id=None):
         response_information = {
             "completion": completion_time,
+            "file": file_id
         }
         
         return self.make_post_request('/api/machines/print/information', None, response_information)
