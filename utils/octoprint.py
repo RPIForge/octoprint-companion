@@ -23,7 +23,7 @@ class octoprint():
         self.ip = os.getenv('OCTOPRINT_IP',"127.0.0.1")
         self.port = os.getenv('OCTOPRINT_PORT',"5000")
         
-        self.variable.logger_class.logger.info("Finished InitalizingOctoprint Class")
+        self.variable.logger_class.logger.info("Finished Initalizing Octoprint Class")
         
         
     
@@ -51,7 +51,7 @@ class octoprint():
     def get_temperature(self):
         response = self.make_get_request("/api/printer",{})
         if(response and "temperature" in response and "tool0" in response["temperature"]):
-            return response["temperature"]["tool0"]
+            return response["temperature"]
         return None
     
     def get_file(self):

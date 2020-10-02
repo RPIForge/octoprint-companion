@@ -10,6 +10,7 @@ class variable():
     octoprint_class = None
     s3_class = None
     logger_class = None
+    website_class = None
     
     #print status
     status = "Offline"
@@ -17,5 +18,5 @@ class variable():
     
     def __init__(self):
         self.name = os.getenv('NAME',"generic_test")
-        self.printer_id = os.getenv('ID',"0")
+        self.printer_id = os.getenv('ID',"1")
         

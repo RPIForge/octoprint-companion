@@ -8,8 +8,8 @@ def get_request(url,payload=None, header=None):
         return None
     return response
 
-def post_request(url,payload=None,data=None):
-    return requests.get(url, params=payload, data=data)
+def post_request(url,paramaters=None,header=None, data=None):
+    return requests.post(url, params=paramaters,  headers=header, data=data)
     
     
   
