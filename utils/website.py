@@ -43,10 +43,11 @@ class website():
             
             
     #send status with time
-    def send_status(self, status):
+    def send_status(self, status, status_text):
         response_status = {
             "machine_id": self.variable.printer_id,
             "status": status,
+            "status_text": status_text
             
         }
         
@@ -57,13 +58,13 @@ class website():
     ##{
     ##  "completion":completion_time
     ##}
-    def send_print_information(self, completion_time, file_id=None):
+    def send_print_information(self, completion_time=None, file_id=None):
         response_information = {
-            "completion": completion_time,
-            "file": file_id
+            "end_time": completion_time,
+            "file_id": file_id
         }
         
-        return self.make_post_request('/api/machines/print/information', None, response_information)
+        return self.make_post_request('/api/machines/print/information', response_information, None)
         
     #send temperature with time
     ##Send dict as follows:
