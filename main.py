@@ -15,7 +15,6 @@ from utils.logging import logger
 logger_instance = logger(variable_instance)
 variable_instance.logger_class = logger_instance
 
-
 #initialize octoprint companion
 from utils.octoprint import octoprint
 octoprint_instance = octoprint(variable_instance)
@@ -33,7 +32,9 @@ variable_instance.website_class = website_instance
 
 #import tasks and schedule tasks
 import tasks
-schedule.every(1).seconds.do(tasks.get_status, variable_instance)
+schedule.every(30).seconds.do(tasks.get_status, variable_instance)
+schedule.every(60).seconds.do(tasks.get_information, variable_instance)
+schedule.every(30).seconds.do(tasks.get_temperature, variable_instance)
 
 #run tasks
 #while True:

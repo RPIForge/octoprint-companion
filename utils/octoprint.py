@@ -5,6 +5,9 @@ import utils.communication
 
 #import exceptions
 from  requests.exceptions import ConnectionError
+
+#import current_time
+import datetime
 class octoprint():
     api_key = None
     ip = None
@@ -42,12 +45,37 @@ class octoprint():
             return None
     
     def get_status(self):
+        status = self.get_status_message()
+        if(status=="Printing from SD" or status=="Printing"):
+            return "printing"
+        elif(status=="Paused"):
+            return "paused"
+        elif(status=="Error"):
+            return "error"
+        elif(status=="Cancelling"):
+            return "cancelling"
+        elif(status=="Offline"):
+            return "offline"
+            
+    
+    def get_status_message(self):
         response = self.make_get_request("/api/job",{})
         if(response and "state" in response):
             return response["state"]
         return None
         
-    
+    def get_end_time(self):
+        response = self.make_get_request("/api/job",{})
+        if(response and "progress" in response):
+            seconds_remaining = int(response["progress"]["printTimeLeft"])
+            current_time = datetime.datetime.now()
+            end_time = current_time + datetime.timedelta(seconds=seconds_remaining)
+            return end_time
+            
+        return None
+            
+        
+        
     def get_temperature(self):
         response = self.make_get_request("/api/printer",{})
         if(response and "temperature" in response and "tool0" in response["temperature"]):

@@ -43,10 +43,15 @@ class website():
             
             
     #send status with time
-    def send_status(self, status):
+    def send_status(self, status_message):
+        status = ''
+        if("print" from status_message.lower()):
+            status = "printing"
+        
         response_status = {
             "machine_id": self.variable.printer_id,
             "status": status,
+            "status_text": status_message
             
         }
         
@@ -55,11 +60,12 @@ class website():
     #send print_information with time
     ##Send dict as follows:
     ##{
-    ##  "completion":completion_time
+    ##  "end_time":completion_time,
+    ##  "file":file_id
     ##}
-    def send_print_information(self, completion_time, file_id=None):
+    def send_print_information(self, completion_time=None, file_id=None):
         response_information = {
-            "completion": completion_time,
+            "end_time": completion_time,
             "file": file_id
         }
         
