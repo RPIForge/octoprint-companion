@@ -46,7 +46,6 @@ class octoprint():
     
     def get_status(self):
         status = self.get_status_message()
-        print(status)
         if(status=="Printing from SD" or status=="Printing"):
             return "printing"
         if(status=="Operational"):

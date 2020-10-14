@@ -34,12 +34,16 @@ def get_temperature(variable):
     if(not temperature_information):
         variable.logger_class.logger.error("Failed to get Temperature Information")
         return
+    else:
+        variable.logger_class.logger.info("Retrived Octoprint Temperature Information")
     
     #send website update
     response = variable.website_class.send_temperature(temperature_information)
     if(response.status_code!=200):
         variable.logger_class.logger.error("Failed to send Temperature Information")
         return
+    else:
+        variable.logger_class.logger.info("Sent Temperature Information update")
     
 #get pritn status
 def get_status(variable):
@@ -80,14 +84,14 @@ def get_status(variable):
             else:
                 variable.logger_class.logger.info("Sent print information update")
                 
-        else:
-            response = variable.website_class.send_status(status, status_text)
+        if(status == "operational" and variable.status == "printing"):
+            variable.logger_class.logger.info("Print Finished, Upadting database")
+            response = variable.website_class.send_status("completed", status_text)
+            
             if(response.status_code != 200):
-                variable.logger_class.logger.error("Unable to send status update")
+                variable.logger_class.logger.error("Unable to send finish print status update")
             else:
-                variable.logger_class.logger.info("Sent print status update")
-        
-        
+                variable.logger_class.logger.info("Sent finish print status update")
         
     variable.status = status
     
