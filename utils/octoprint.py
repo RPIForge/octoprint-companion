@@ -46,8 +46,11 @@ class octoprint():
     
     def get_status(self):
         status = self.get_status_message()
+        print(status)
         if(status=="Printing from SD" or status=="Printing"):
             return "printing"
+        if(status=="Operational"):
+            return "operational"
         elif(status=="Paused"):
             return "paused"
         elif(status=="Error"):
@@ -56,6 +59,8 @@ class octoprint():
             return "cancelling"
         elif(status=="Offline"):
             return "offline"
+        else:
+            return None
             
     
     def get_status_message(self):
@@ -67,6 +72,9 @@ class octoprint():
     def get_end_time(self):
         response = self.make_get_request("/api/job",{})
         if(response and "progress" in response):
+            if(response["progress"]["printTimeLeft"] is None):
+                return None
+                
             seconds_remaining = int(response["progress"]["printTimeLeft"])
             current_time = datetime.datetime.now()
             end_time = current_time + datetime.timedelta(seconds=seconds_remaining)
@@ -80,6 +88,7 @@ class octoprint():
         response = self.make_get_request("/api/printer",{})
         if(response and "temperature" in response and "tool0" in response["temperature"]):
             return response["temperature"]
+        
         return None
     
     def get_file(self):

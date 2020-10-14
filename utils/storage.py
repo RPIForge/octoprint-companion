@@ -46,8 +46,13 @@ class s3():
     
     def upload_file(self, file):
         object_name = str(uuid.uuid4())          
-        self.s3_resource.meta.client.upload_file(file, self.bucket, object_name)
-        return object_name
+        try:
+            self.s3_resource.meta.client.upload_file(file, self.bucket, object_name)
+            return object_name
+        except:
+            self.logger.error("Failed to upload file")
+            return ""
+        
        
         
 
