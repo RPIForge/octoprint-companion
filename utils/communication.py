@@ -1,14 +1,19 @@
 import requests
 
 def get_request(url,payload=None, header=None):
-    
-    response = requests.get(url, params=payload, headers=header)
-    if(response.status_code!=200):
+    try:
+        response = requests.get(url, params=payload, headers=header)
+        if(response.status_code!=200):
+            return None
+        return response
+    except:
         return None
-    return response
-
+    
 def post_request(url,paramaters=None,header=None, data=None):
-    return requests.post(url, params=paramaters,  headers=header, data=data)
+    try:
+        return requests.post(url, params=paramaters,  headers=header, data=data)
+    except:
+        return None
     
     
   

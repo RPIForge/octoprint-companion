@@ -90,7 +90,7 @@ class website():
             "machine_id": self.variable.printer_id
         }
         
-        return self.make_post_request('/api/machines/temperature', paramaters,  tool_array)
+        return self.make_post_request('/api/machines/print/temperature', paramaters,  tool_array)
         
     
     
