@@ -1,18 +1,36 @@
 import requests
+import logging
+
 
 def get_request(url,payload=None, header=None):
+    log = logging.getLogger('general_logger')
     try:
+        
         response = requests.get(url, params=payload, headers=header)
+        log.debug("get response from {} code: {} content: {}".format(url, response.status_code,response.content))
+        
         if(response.status_code!=200):
             return None
         return response
-    except:
+    except Exception as e:
+        log.error("get request failed")
+        log.error(e, exc_info=True)
         return None
     
 def post_request(url,paramaters=None,header=None, data=None):
+    log = logging.getLogger('general_logger')
     try:
-        return requests.post(url, params=paramaters,  headers=header, data=data)
-    except:
+        
+        response = requests.post(url, params=paramaters,  headers=header, data=data)
+        log.debug("post response from {} code: {} content: {}".format(url, response.status_code,response.content))
+        
+        if(response.status_code!=200):
+            return None
+        return response
+        
+    except Exception as e:
+        log.error("post request failed")
+        log.error(e, exc_info=True)
         return None
     
     
@@ -30,4 +48,3 @@ def get_file(url,payload=None, header=None):
         return request.content
         
     return None
-    

@@ -18,7 +18,13 @@ class logger():
 
         self.logger = logging.getLogger('general_logger')
         
-        level = logging.INFO
+        level_var = os.getenv('LOG',"INFO")
+        if(level_var == "INFO"):
+            level = logging.INFO
+        elif(level_var == "DEBUG"):
+            level = logging.DEBUG
+        elif(level_var == "ERROR"):
+            level = logging.ERROR
 
         #Set logger levels
         self.logger.setLevel(level)
