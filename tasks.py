@@ -25,6 +25,9 @@ def get_temperature(variable):
     #log start of status
     variable.logger_class.logger.info("Getting Octoprint Temperature Information")
     
+    if(variable.status!="printing"):
+        return
+    
     #get printer status
     octoprint = variable.octoprint_class
     temperature_information = octoprint.get_temperature()
