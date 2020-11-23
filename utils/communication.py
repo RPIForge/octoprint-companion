@@ -14,7 +14,7 @@ def get_request(url,payload=None, header=None):
         return response
     except Exception as e:
         log.error("get request failed")
-        log.error(e, exc_info=True)
+        log.error(e)
         return None
     
 def post_request(url,paramaters=None,header=None, data=None):
@@ -30,7 +30,7 @@ def post_request(url,paramaters=None,header=None, data=None):
         
     except Exception as e:
         log.error("post request failed")
-        log.error(e, exc_info=True)
+        log.error(e)
         return None
     
     

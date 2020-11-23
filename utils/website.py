@@ -29,16 +29,18 @@ class website():
         try:
             headers = {'X-Api-Key':self.api_key}
             return utils.communication.get_json(self.get_url()+endpoint, dictionary, headers)
-        except ConnectionError:
+        except ConnectionError as ex:
             self.logger.error("Unable to reach main site")
+            self.logger.error(ex)
             return None
     
     def make_post_request(self,endpoint, paramaters, data):
         try:
             headers = {'X-API-Key':self.api_key} 
             return utils.communication.post_request(self.get_url()+endpoint, paramaters, headers, json.dumps(data))
-        except ConnectionError:
+        except ConnectionError as ex:
             self.logger.error("Unable to reach main site")
+            self.logger.error(ex)
             return None
             
             

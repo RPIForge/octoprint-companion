@@ -12,7 +12,7 @@ import datetime
 
 class s3():
     s3_resource = None
-    bucket = None
+    s3_bucket = None
     
     variable = None
     logger = None
@@ -34,12 +34,21 @@ class s3():
                 service_name="s3",
                 aws_access_key_id=user,
                 aws_secret_access_key=secret,
+                config=boto3.session.Config(signature_version='s3v4'),
                 endpoint_url='http://{}:{}'.format(ip,port),
             ) 
-        except:
+            
+            bucket_name = '{}'.format(self.variable.name)
+            self.s3_bucket = self.s3_resource.Bucket(name=bucket_name)
+            
+            if(self.s3_bucket not in self.s3_resource.buckets.all()):
+                self.s3_bucket = self.s3_resource.create_bucket(Bucket=bucket_name)
+                
+        except Exception as ex:
             self.logger.error("Failed connecting to s3 resource")
+            self.logger.error(ex)
         
-        self.bucket = self.variable.name
+        
         
 
 
@@ -47,10 +56,12 @@ class s3():
     def upload_file(self, file):
         object_name = str(uuid.uuid4())          
         try:
-            self.s3_resource.meta.client.upload_file(file, self.bucket, object_name)
+            self.s3_bucket.upload_file(file.name, object_name)
+            self.logger.info("Successfully uploaded file")
             return object_name
-        except:
+        except Exception as ex:
             self.logger.error("Failed to upload file")
+            self.logger.error(ex)
             return ""
         
        

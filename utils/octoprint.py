@@ -1,7 +1,9 @@
 
 #import helper modules
 import os
+import tempfile
 import utils.communication
+
 
 #import exceptions
 from  requests.exceptions import ConnectionError
@@ -105,7 +107,17 @@ class octoprint():
             return None
          
 
-        return utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
+        file_data = utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
+        file_string = file_data.decode()
+        
+        f = open("demofile2.txt", "r+")
+        f.write(file_string)
+        #f.close()
+
+        temp_file = tempfile.TemporaryFile()
+        temp_file.write(file_data)
+        
+        return f
         
         
         
