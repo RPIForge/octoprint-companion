@@ -56,6 +56,14 @@ class s3():
     def upload_file(self, file):
         object_name = str(uuid.uuid4())          
         try:
+            #this is to save space and just return the hash of the previos upload
+            current_hash = file.fileinfo['hash']
+            for previous_upload in self.s3_bucket.objects.all():
+                if(previous_upload.e_tag == "\""+str(current_hash)+"\""):
+                    return previous_upload.key
+                    
+                
+            
             self.s3_bucket.upload_file(file.name, object_name)
             self.logger.info("Successfully uploaded file")
             return object_name

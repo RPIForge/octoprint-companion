@@ -3,7 +3,7 @@
 import os
 import tempfile
 import utils.communication
-
+import hashlib
 
 #import exceptions
 from  requests.exceptions import ConnectionError
@@ -108,16 +108,15 @@ class octoprint():
          
 
         file_data = utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
-        file_string = file_data.decode()
+        file_hex = hashlib.md5(file_data).hexdigest()
         
-        f = open("demofile2.txt", "r+")
-        f.write(file_string)
-        #f.close()
-
-        temp_file = tempfile.TemporaryFile()
+        temp_file = tempfile.NamedTemporaryFile()
         temp_file.write(file_data)
+        temp_file.fileinfo = {'hash': file_hex}
         
-        return f
+        
+            
+        return temp_file
         
         
         

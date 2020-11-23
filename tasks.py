@@ -71,8 +71,6 @@ def get_status(variable):
         if(status == "printing" and variable.status!="paused"):
             variable.logger_class.logger.info("Print Starting, Updating database")
             file = octoprint.get_file()
-            print(file)
-            print(dir(file))
             file_id = variable.s3_class.upload_file(file)
             
             response = variable.website_class.send_status(status, status_text)
