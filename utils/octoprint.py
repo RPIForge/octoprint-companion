@@ -1,10 +1,15 @@
 
 #import helper modules
 import os
+import tempfile
 import utils.communication
+import hashlib
 
 #import exceptions
 from  requests.exceptions import ConnectionError
+
+#import current_time
+import datetime
 class octoprint():
     api_key = None
     ip = None
@@ -23,7 +28,7 @@ class octoprint():
         self.ip = os.getenv('OCTOPRINT_IP',"127.0.0.1")
         self.port = os.getenv('OCTOPRINT_PORT',"5000")
         
-        self.variable.logger_class.logger.info("Finished InitalizingOctoprint Class")
+        self.variable.logger_class.logger.info("Finished Initalizing Octoprint Class")
         
         
     
@@ -42,16 +47,49 @@ class octoprint():
             return None
     
     def get_status(self):
+        status = self.get_status_message()
+        if(status=="Printing from SD" or status=="Printing"):
+            return "printing"
+        if(status=="Operational"):
+            return "operational"
+        elif(status=="Paused"):
+            return "paused"
+        elif(status=="Error"):
+            return "error"
+        elif(status=="Cancelling"):
+            return "cancelling"
+        elif(status=="Offline"):
+            return "offline"
+        else:
+            return None
+            
+    
+    def get_status_message(self):
         response = self.make_get_request("/api/job",{})
         if(response and "state" in response):
             return response["state"]
         return None
         
-    
+    def get_end_time(self):
+        response = self.make_get_request("/api/job",{})
+        if(response and "progress" in response):
+            if(response["progress"]["printTimeLeft"] is None):
+                return None
+                
+            seconds_remaining = int(response["progress"]["printTimeLeft"])
+            current_time = datetime.datetime.now()
+            end_time = current_time + datetime.timedelta(seconds=seconds_remaining)
+            return end_time
+            
+        return None
+            
+        
+        
     def get_temperature(self):
         response = self.make_get_request("/api/printer",{})
         if(response and "temperature" in response and "tool0" in response["temperature"]):
-            return response["temperature"]["tool0"]
+            return response["temperature"]
+        
         return None
     
     def get_file(self):
@@ -69,7 +107,16 @@ class octoprint():
             return None
          
 
-        return utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
+        file_data = utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
+        file_hex = hashlib.md5(file_data).hexdigest()
+        
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.write(file_data)
+        temp_file.fileinfo = {'hash': file_hex}
+        
+        
+            
+        return temp_file
         
         
         

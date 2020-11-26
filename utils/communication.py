@@ -1,20 +1,46 @@
 import requests
+import logging
+
 
 def get_request(url,payload=None, header=None):
-    
-    response = requests.get(url, params=payload, headers=header)
-
-    if(response.status_code!=200):
+    log = logging.getLogger('general_logger')
+    try:
+        
+        response = requests.get(url, params=payload, headers=header)
+        log.debug("get response from {} code: {} content: {}".format(url, response.status_code,response.content))
+        
+        if(response.status_code!=200):
+            return None
+        return response
+    except Exception as e:
+        log.error("get request failed")
+        log.error(e)
         return None
-    return response
-
-def post_request(url,payload=None,data=None):
-    return requests.get(url, params=payload, data=data)
+    
+def post_request(url,paramaters=None,header=None, data=None):
+    log = logging.getLogger('general_logger')
+    try:
+        
+        response = requests.post(url, params=paramaters,  headers=header, data=data)
+        log.debug("post response from {} code: {} content: {}".format(url, response.status_code,response.content))
+        
+        if(response.status_code!=200):
+            return None
+        return response
+        
+    except Exception as e:
+        log.error("post request failed")
+        log.error(e)
+        return None
     
     
   
 def get_json(url,payload=None, header=None):
-    return get_request(url,payload,header).json()
+    response = get_request(url,payload,header)
+    if(response):
+        return response.json()
+    return None
+    
     
 def get_file(url,payload=None, header=None):
     request = get_request(url,None,header)
@@ -22,4 +48,3 @@ def get_file(url,payload=None, header=None):
         return request.content
         
     return None
-    
