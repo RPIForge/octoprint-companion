@@ -17,6 +17,6 @@ class variable():
     job_id = None
     
     def __init__(self):
-        self.name = os.getenv('NAME',"generic_test")
-        self.printer_id = os.getenv('ID',"1")
+        self.name = os.getenv('PRINTER_NAME',"generic-test")
+        self.printer_id = os.getenv('PRINTER_ID',"1")
         

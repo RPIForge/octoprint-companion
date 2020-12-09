@@ -118,6 +118,32 @@ class octoprint():
             
         return temp_file
         
+    def get_layer_information(self):
+        layer_iformation = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
+        if(not layer_iformation):
+            return None
+
+        layer_iformation = layer_iformation["layer"]
+        output_information = {
+            "current": layer_iformation["current"],
+            "total": layer_iformation["total"]
+        }    
+
+        return output_information
+    
+    def get_printer_height(self):
+        layer_iformation = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
+        if(not layer_iformation):
+            return None
+
+        layer_iformation = layer_iformation["height"]
+        output_information = {
+            "current": layer_iformation["current"],
+            "total": layer_iformation["total"]
+        }     
+
+        return output_information  
+
         
         
         

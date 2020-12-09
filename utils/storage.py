@@ -21,8 +21,8 @@ class s3():
         self.logger = self.variable.logger_class.logger
         
         
-        user = os.getenv('S3_USER',"")
-        secret = os.getenv('S3_SECRET',"")
+        user = os.getenv('S3_USER',"user")
+        secret = os.getenv('S3_SECRET',"123456789")
         ip = os.getenv('S3_IP',"192.168.1.10")
         port = os.getenv('S3_PORT',"8000")
         
@@ -30,11 +30,13 @@ class s3():
         
         try:
             self.logger.info("Connecting to s3 resource")
+
+
             self.s3_resource = session.resource(
                 service_name="s3",
                 aws_access_key_id=user,
                 aws_secret_access_key=secret,
-                config=boto3.session.Config(signature_version='s3v4'),
+                config=boto3.session.Config(signature_version='s3v4', connect_timeout=5, retries={'max_attempts': 0}),
                 endpoint_url='http://{}:{}'.format(ip,port),
             ) 
             

@@ -45,6 +45,38 @@ def get_temperature(variable):
         return
     else:
         variable.logger_class.logger.info("Sent Temperature Information update")
+
+def get_location(variable):
+    #log start of status
+    variable.logger_class.logger.info("Getting Octoprint Location Information")
+    
+    if(variable.status!="printing"):
+        variable.logger_class.logger.info("Skipping Getting Octoprint Location Information")
+        return
+    
+    #get printer status
+    octoprint = variable.octoprint_class
+    layer_information = octoprint.get_layer_information()
+    if(not layer_information):
+        variable.logger_class.logger.error("Failed to get Octoprint Layer Information")
+        return
+    else:
+        variable.logger_class.logger.info("Retrived Octoprint Layer Information")
+
+    height_information = octoprint.get_printer_height()
+    if(not layer_information):
+        variable.logger_class.logger.error("Failed to get Octoprint Height Information")
+        return
+    else:
+        variable.logger_class.logger.info("Retrived Octoprint Height Information")
+    
+    #send website update
+    response = variable.website_class.send_Location(layer_information, height_information)
+    if(not response or response.status_code!=200):
+        variable.logger_class.logger.error("Failed to send Location Information")
+        return
+    else:
+        variable.logger_class.logger.info("Sent Location update")
     
 #get pritn status
 def get_status(variable):

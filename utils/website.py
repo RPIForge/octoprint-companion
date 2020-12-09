@@ -94,6 +94,18 @@ class website():
         
         return self.make_post_request('/api/machines/print/temperature', paramaters,  tool_array)
         
+    def send_Location(self, layer_information, height_information):
+
+        paramaters = {
+            "machine_id": self.variable.printer_id
+        }
+
+        data = {
+            "layer": layer_information,
+            "height": height_information
+        }
+
+        return self.make_post_request('/api/machines/print/location', paramaters,  data)
     
     
         
