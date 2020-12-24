@@ -1,7 +1,11 @@
-import os
-
+#octoprint imports
 import utils.communication
+
+#general imports
+import os
 import json
+import datetime
+
 #Class for syncing variables
 class website():
     ip = None
@@ -43,7 +47,30 @@ class website():
             self.logger.error(ex)
             return None
             
-            
+    def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
+        data_dict = {
+            'time':datetime.datetime.now()
+        }
+        
+        data = {}
+        if(machine_data):
+            data['machine'] = machine_data
+
+        if(print_data):
+            data['print'] = print_data
+
+        if(temperature_data):
+            data['temperature'] = temperature_data
+
+        if(location_data):
+            data['location'] = location_data
+        
+        data_dict["data"] = data
+        self.make_post_request("/api/machines/data",{},data_dict)
+
+
+
+
     #send status with time
     def send_status(self, status, status_text):
         response_status = {
