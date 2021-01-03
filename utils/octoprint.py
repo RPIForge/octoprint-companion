@@ -46,8 +46,10 @@ class octoprint():
             self.logger.error("Unable to reach printer")
             return None
     
-    def get_status(self):
-        status = self.get_status_message()
+    def get_status(self, status=None):
+        if(status is None):
+            status = self.get_status_message()
+            
         if(status=="Printing from SD" or status=="Printing"):
             return "printing"
         if(status=="Operational"):
