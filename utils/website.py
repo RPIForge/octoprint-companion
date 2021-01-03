@@ -70,5 +70,5 @@ class website():
             'machine_id':self.variable.printer_id
         }
 
-        return self.make_post_request("/api/machines/data",machine_dict,data_dict)
+        return self.make_post_request("/data/machines/data",machine_dict,data_dict)
         
