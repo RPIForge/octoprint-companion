@@ -10,6 +10,7 @@ def get_request(url,payload=None, header=None):
         log.debug("get response from {} code: {} content: {}".format(url, response.status_code,response.content))
         
         if(response.status_code!=200):
+            log.error('get failed from {} code: {}'.format(url, response.status_code))
             return None
         return response
     except Exception as e:
@@ -25,6 +26,7 @@ def post_request(url,paramaters=None,header=None, data=None):
         log.debug("post response from {} code: {} content: {}".format(url, response.status_code,response.content))
         
         if(response.status_code!=200):
+            log.error('post failed from {} code: {}'.format(url, response.status_code))
             return None
         return response
         

@@ -49,7 +49,7 @@ class website():
             
     def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
         data_dict = {
-            'time':datetime.datetime.now()
+            'time':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         
         data = {}
@@ -66,73 +66,9 @@ class website():
             data['location'] = location_data
         
         data_dict["data"] = data
-        self.make_post_request("/api/machines/data",{},data_dict)
-
-
-
-
-    #send status with time
-    def send_status(self, status, status_text):
-        response_status = {
-            "machine_id": self.variable.printer_id,
-            "status": status,
-            "status_text": status_text
-        }
-        
-        return self.make_post_request('/api/machines/status', response_status, None)
-    
-    #send print_information with time
-    ##Send dict as follows:
-    ##{
-    ##  "end_time":completion_time,
-    ##  "file_id":file_id
-    ##}
-    def send_print_information(self, completion_time=None, file_id=None):
-        response_information = {
-            "machine_id": self.variable.printer_id,
-            "end_time": completion_time,
-            "file_id": file_id
-        }
-        
-        return self.make_post_request('/api/machines/print/information', response_information, None)
-        
-    #send temperature with time
-    ##Send dict as follows:
-    ##    [{"tool_name":"name",
-    ##        "temperature":temp,
-    ##        "goal":temp_goal
-    ##      },
-    ##    ]
-    def send_temperature(self, temperature_information):
-        tool_array = []
-        for tool in temperature_information:
-            information = {}
-            information["tool_name"] = tool
-            information["temperature"] = temperature_information[tool]["actual"]
-            information["goal"] = temperature_information[tool]["target"]
-            if(not information["goal"]):
-                information["goal"] = 0
-                
-            tool_array.append(information)
-        
-        paramaters = {
-            "machine_id": self.variable.printer_id
-        }
-        
-        return self.make_post_request('/api/machines/print/temperature', paramaters,  tool_array)
-        
-    def send_Location(self, layer_information, height_information):
-
-        paramaters = {
-            "machine_id": self.variable.printer_id
+        machine_dict = {
+            'machine_id':self.variable.printer_id
         }
 
-        data = {
-            "layer": layer_information,
-            "height": height_information
-        }
-
-        return self.make_post_request('/api/machines/print/location', paramaters,  data)
-    
-    
+        return self.make_post_request("/api/machines/data",machine_dict,data_dict)
         

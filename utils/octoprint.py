@@ -49,7 +49,7 @@ class octoprint():
     def get_status(self, status=None):
         if(status is None):
             status = self.get_status_message()
-            
+
         if(status=="Printing from SD" or status=="Printing"):
             return "printing"
         if(status=="Operational"):
@@ -127,8 +127,8 @@ class octoprint():
 
         layer_iformation = layer_iformation["layer"]
         output_information = {
-            "current": layer_iformation["current"],
-            "total": layer_iformation["total"]
+            "current_layer": layer_iformation["current"],
+            "max_layer": layer_iformation["total"]
         }    
 
         return output_information
@@ -140,8 +140,8 @@ class octoprint():
 
         layer_iformation = layer_iformation["height"]
         output_information = {
-            "current": layer_iformation["current"],
-            "total": layer_iformation["total"]
+            "current_height": layer_iformation["current"],
+            "max_height": layer_iformation["total"]
         }     
 
         return output_information  
