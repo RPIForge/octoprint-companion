@@ -86,7 +86,6 @@ class octoprint():
         return None
             
         
-        
     def get_temperature(self):
         response = self.make_get_request("/api/printer",{})
         if(response and "temperature" in response and "tool0" in response["temperature"]):
@@ -127,6 +126,7 @@ class octoprint():
 
         layer_iformation = layer_iformation["layer"]
         output_information = {
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "current_layer": layer_iformation["current"],
             "max_layer": layer_iformation["total"]
         }    
@@ -140,6 +140,7 @@ class octoprint():
 
         layer_iformation = layer_iformation["height"]
         output_information = {
+            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "current_height": layer_iformation["current"],
             "max_height": layer_iformation["total"]
         }     

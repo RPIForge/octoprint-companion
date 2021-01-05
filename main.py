@@ -33,10 +33,10 @@ variable_instance.website_class = website_instance
 #import tasks and schedule tasks
 import tasks
 schedule.every(5).seconds.do(tasks.get_status, variable_instance)
+schedule.every(2.5).seconds.do(tasks.get_temperature, variable_instance)
+schedule.every(2.5).seconds.do(tasks.get_location, variable_instance)
 schedule.every(10).seconds.do(tasks.get_end_time, variable_instance)
-schedule.every(5).seconds.do(tasks.get_temperature, variable_instance)
-schedule.every(5).seconds.do(tasks.get_location, variable_instance)
-
+schedule.every(10).seconds.do(tasks.update_website, variable_instance)
 
 #run tasks
 while True:

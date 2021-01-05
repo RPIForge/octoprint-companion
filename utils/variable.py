@@ -14,7 +14,13 @@ class variable():
     
     #print status
     status = "Offline"
-    job_id = None
+
+
+    #print data
+    temperature_data = []
+    location_data = []
+    machine_data = {}
+    print_data = {}
     
     def __init__(self):
         self.name = os.getenv('PRINTER_NAME',"generic-test")

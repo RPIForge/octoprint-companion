@@ -1,4 +1,4 @@
-
+from datetime import datetime
 
 def get_end_time(variable):
     #log start of status
@@ -14,26 +14,22 @@ def get_end_time(variable):
         variable.logger_class.logger.error("Failed to get End Time")
         return
     
-    print_dict = {
+    #update variable dict
+    print_data = {
         "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S")
     }
 
-    #send website update
-    response = variable.website_class.send_data(print_data=print_dict)
-
-    if(not response or response.status_code!=200):
-        variable.logger_class.logger.error("Failed to send end time")
-    else:
-        variable.logger_class.logger.info("Sent end time")
+    variable.print_data.update(print_data)
+    variable.logger_class.logger.info("Updated Print end_time")
 
 def get_temperature(variable):
     #log start of status
     variable.logger_class.logger.info("Getting Octoprint Temperature Information")
     
-    if(variable.status!="printing"):
-        variable.logger_class.logger.info("Skipping Getting Octoprint Temperature Information")
+    if(variable.status == "Offline"):
+        variable.logger_class.logger.info("Skipping getting Octoprint Temperature Information")
         return
-    
+
     #get printer status
     octoprint = variable.octoprint_class
     temperature_information = octoprint.get_temperature()
@@ -44,22 +40,28 @@ def get_temperature(variable):
         variable.logger_class.logger.info("Retrived Octoprint Temperature Information")
     
 
-    #send website update
-    response = variable.website_class.send_data(temperature_data=temperature_information)
-    if(not response or response.status_code!=200):
-        variable.logger_class.logger.error("Failed to send Temperature Information")
+    if(variable.status!="printing"):
+        variable.logger_class.logger.info("Skipping setting print Temperature Information")
         return
-    else:
-        variable.logger_class.logger.info("Sent Temperature Information update")
+
+
+    temperature_data = {
+        'data':temperature_information,
+        'time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    variable.temperature_data.append(temperature_data)
+    variable.logger_class.logger.info("Added Print Temperature Information")
+
 
 def get_location(variable):
     #log start of status
     variable.logger_class.logger.info("Getting Octoprint Location Information")
     
-    if(variable.status!="printing"):
-        variable.logger_class.logger.info("Skipping Getting Octoprint Location Information")
+    if(variable.status == "Offline"):
+        variable.logger_class.logger.info("Skipping getting Octoprint Location Information")
         return
-    
+
     #get printer status
     octoprint = variable.octoprint_class
     layer_information = octoprint.get_layer_information()
@@ -78,13 +80,18 @@ def get_location(variable):
     
     height_information.update(layer_information)
 
-    #send website update
-    response = variable.website_class.send_data(location_data=height_information)
-    if(not response or response.status_code!=200):
-        variable.logger_class.logger.error("Failed to send Location Information")
+    #updated
+    if(variable.status!="printing"):
+        variable.logger_class.logger.info("Skipping Getting Octoprint Location Information")
         return
-    else:
-        variable.logger_class.logger.info("Sent Location update")
+    
+    location_data = {
+        'data':height_information,
+        'time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    variable.location_data.append(location_data)
+    variable.logger_class.logger.info("Added Print Location Information")
+
     
 #get pritn status
 def get_status(variable):
@@ -103,14 +110,13 @@ def get_status(variable):
         return
     
     
-    
     #if new status
     if(status != variable.status):
         variable.logger_class.logger.info("Status Changed")
         
         #if new print
         if(status == "printing" and variable.status!="paused"):
-            variable.logger_class.logger.info("Print Starting, Updating database")
+            variable.logger_class.logger.info("Print Starting")
             file = octoprint.get_file()
             file_id = variable.s3_class.upload_file(file)
             
@@ -121,28 +127,18 @@ def get_status(variable):
 
             information_dict = {
                 'file_id':file_id
-            }            
+            }       
 
-            response = variable.website_class.send_data(machine_data=machine_dict, print_data=information_dict)
-            if(not response or response.status_code != 200):
-                variable.logger_class.logger.error("Unable to send new print update")
-            else:
-                variable.logger_class.logger.info("Sent new print update")
-            
-             
+            if(information_dict):
+                variable.print_data.update(information_dict)     
+                         
         if(status == "operational" and variable.status == "printing"):
-            variable.logger_class.logger.info("Print Finished, Upadting database")
+            variable.logger_class.logger.info("Print Finished")
             
             machine_dict = {
                 'status':"completed",
                 'status_message':status_text
             }
-            response = variable.website_class.send_data(machine_data=machine_dict)
-            
-            if(not response or response.status_code != 200):
-                variable.logger_class.logger.error("Unable to send finish print status update")
-            else:
-                variable.logger_class.logger.info("Sent finish print status update")
         
         else:
             variable.logger_class.logger.info("Printer is now {}".format(status))
@@ -151,14 +147,30 @@ def get_status(variable):
                 'status':status,
                 'status_message':status_text
             }
-            response = variable.website_class.send_data(machine_data=machine_dict)
-                        
-            if(not response or response.status_code != 200):
-                variable.logger_class.logger.error("Unable to send status update")
-            else:
-                variable.logger_class.logger.info("Sent status update")
+        
+        variable.machine_data.update(machine_dict)
+        
     else:
         variable.logger_class.logger.info("Status unchanged")
         
     variable.status = status
+
+
+def update_website(variable):
+    #log start of status
+    variable.logger_class.logger.info("Updating Website Data")
+
+    response = variable.website_class.send_data(variable.machine_data,variable.print_data,variable.temperature_data,variable.location_data)
+    if(not response):
+        variable.logger_class.logger.error("Failed to update website Octoprint data")
+        return
+    else:
+        variable.logger_class.logger.info("Successfully updated website")
+
+    variable.machine_data = {}
+    variable.print_data = {}
+    variable.temperature_data = []
+    variable.location_data = []
+    
+
     
