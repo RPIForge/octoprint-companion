@@ -16,13 +16,15 @@ class s3():
     
     variable = None
     logger = None
+    connected = False
+
     def __init__(self, variable_class):
         self.variable = variable_class
         self.logger = self.variable.logger_class.logger
         
         
         user = os.getenv('S3_USER',"user")
-        secret = os.getenv('S3_SECRET',"123456789")
+        secret = os.getenv('S3_KEY',"123456789")
         ip = os.getenv('S3_IP',"192.168.1.10")
         port = os.getenv('S3_PORT',"8000")
         
@@ -46,9 +48,11 @@ class s3():
             if(self.s3_bucket not in self.s3_resource.buckets.all()):
                 self.s3_bucket = self.s3_resource.create_bucket(Bucket=bucket_name)
                 
+            self.connected = True
         except Exception as ex:
             self.logger.error("Failed connecting to s3 resource")
             self.logger.error(ex)
+            self.connected = False
         
         
         
@@ -56,6 +60,9 @@ class s3():
 
     
     def upload_file(self, file):
+        if(not self.connected):
+            self.logger.info("S3 resource is not connected. Skipping upload")
+        
         object_name = str(uuid.uuid4())          
         try:
             #this is to save space and just return the hash of the previos upload
