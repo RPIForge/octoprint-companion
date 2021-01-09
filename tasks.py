@@ -26,7 +26,7 @@ def get_temperature(variable):
     #log start of status
     variable.logger_class.logger.info("Getting Octoprint Temperature Information")
     
-    if(variable.status == "Offline"):
+    if(variable.status == "offline"):
         variable.logger_class.logger.info("Skipping getting Octoprint Temperature Information")
         return
 
@@ -58,7 +58,7 @@ def get_location(variable):
     #log start of status
     variable.logger_class.logger.info("Getting Octoprint Location Information")
     
-    if(variable.status == "Offline"):
+    if(variable.status == "offline"):
         variable.logger_class.logger.info("Skipping getting Octoprint Location Information")
         return
 

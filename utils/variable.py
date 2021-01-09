@@ -23,6 +23,6 @@ class variable():
     print_data = {}
     
     def __init__(self):
-        self.name = os.getenv('PRINTER_NAME',"generic-test")
-        self.printer_id = os.getenv('PRINTER_ID',"1")
+        self.name = os.getenv('NAME',"generic-test")
+        self.printer_id = os.getenv('ID',"1")
         

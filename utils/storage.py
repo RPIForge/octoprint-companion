@@ -62,6 +62,7 @@ class s3():
     def upload_file(self, file):
         if(not self.connected):
             self.logger.info("S3 resource is not connected. Skipping upload")
+            return ""
         
         object_name = str(uuid.uuid4())          
         try:
