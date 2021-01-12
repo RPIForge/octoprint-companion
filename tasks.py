@@ -2,9 +2,9 @@ from datetime import datetime
 
 def get_end_time(variable):
     #log start of status
-    variable.logger_class.logger.info("Getting Octoprint end time")
+    variable.logger_class.logger.debug("Getting Octoprint end time")
     if(variable.status != "printing"):
-        variable.logger_class.logger.info("Skipping getting Octoprint end time")
+        variable.logger_class.logger.debug("Skipping getting Octoprint end time")
         return
         
     #get printer status
@@ -20,14 +20,14 @@ def get_end_time(variable):
     }
 
     variable.print_data.update(print_data)
-    variable.logger_class.logger.info("Updated Print end_time")
+    variable.logger_class.logger.debug("Updated Print end_time")
 
 def get_temperature(variable):
     #log start of status
-    variable.logger_class.logger.info("Getting Octoprint Temperature Information")
+    variable.logger_class.logger.debug("Getting Octoprint Temperature Information")
     
     if(variable.status == "offline"):
-        variable.logger_class.logger.info("Skipping getting Octoprint Temperature Information")
+        variable.logger_class.logger.debug("Skipping getting Octoprint Temperature Information")
         return
 
     #get printer status
@@ -37,11 +37,11 @@ def get_temperature(variable):
         variable.logger_class.logger.error("Failed to get Temperature Information")
         return
     else:
-        variable.logger_class.logger.info("Retrived Octoprint Temperature Information")
+        variable.logger_class.logger.debug("Retrived Octoprint Temperature Information")
     
 
     if(variable.status!="printing"):
-        variable.logger_class.logger.info("Skipping setting print Temperature Information")
+        variable.logger_class.logger.debug("Skipping setting print Temperature Information")
         return
 
 
@@ -51,15 +51,15 @@ def get_temperature(variable):
     }
 
     variable.temperature_data.append(temperature_data)
-    variable.logger_class.logger.info("Added Print Temperature Information")
+    variable.logger_class.logger.debug("Added Print Temperature Information")
 
 
 def get_location(variable):
     #log start of status
-    variable.logger_class.logger.info("Getting Octoprint Location Information")
+    variable.logger_class.logger.debug("Getting Octoprint Location Information")
     
     if(variable.status == "offline"):
-        variable.logger_class.logger.info("Skipping getting Octoprint Location Information")
+        variable.logger_class.logger.debug("Skipping getting Octoprint Location Information")
         return
 
     #get printer status
@@ -69,20 +69,20 @@ def get_location(variable):
         variable.logger_class.logger.error("Failed to get Octoprint Layer Information")
         return
     else:
-        variable.logger_class.logger.info("Retrived Octoprint Layer Information")
+        variable.logger_class.logger.debug("Retrived Octoprint Layer Information")
 
     height_information = octoprint.get_printer_height()
     if(not layer_information):
         variable.logger_class.logger.error("Failed to get Octoprint Height Information")
         return
     else:
-        variable.logger_class.logger.info("Retrived Octoprint Height Information")
+        variable.logger_class.logger.debug("Retrived Octoprint Height Information")
     
     height_information.update(layer_information)
 
     #updated
     if(variable.status!="printing"):
-        variable.logger_class.logger.info("Skipping Getting Octoprint Location Information")
+        variable.logger_class.logger.debug("Skipping Getting Octoprint Location Information")
         return
     
     location_data = {
@@ -90,13 +90,13 @@ def get_location(variable):
         'time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     variable.location_data.append(location_data)
-    variable.logger_class.logger.info("Added Print Location Information")
+    variable.logger_class.logger.debug("Added Print Location Information")
 
     
 #get pritn status
 def get_status(variable):
     #log start of status
-    variable.logger_class.logger.info("Getting Octoprint Status")
+    variable.logger_class.logger.debug("Getting Octoprint Status")
     
     #get printer status
     octoprint = variable.octoprint_class
@@ -112,7 +112,7 @@ def get_status(variable):
     
     #if new status
     if(status != variable.status):
-        variable.logger_class.logger.info("Status Changed")
+        variable.logger_class.logger.debug("Status Changed")
         
         #if new print
         if(status == "printing" and variable.status!="paused"):
@@ -151,7 +151,7 @@ def get_status(variable):
         variable.machine_data.update(machine_dict)
         
     else:
-        variable.logger_class.logger.info("Status unchanged")
+        variable.logger_class.logger.debug("Status unchanged")
         
     variable.status = status
 
@@ -166,7 +166,7 @@ def update_website(variable):
             variable.logger_class.logger.error("Failed to update site with Octoprint data")
             return
         else:
-            variable.logger_class.logger.info("Successfully updated site")
+            variable.logger_class.logger.debug("Successfully updated site")
 
     variable.machine_data = {}
     variable.print_data = {}
