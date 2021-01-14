@@ -166,12 +166,13 @@ def update_website(variable):
             variable.logger_class.logger.error("Failed to update site with Octoprint data")
             return
         else:
-            variable.logger_class.logger.debug("Successfully updated site")
+            variable.logger_class.logger.info("Successfully updated site")
 
     variable.machine_data = {}
     variable.print_data = {}
     variable.temperature_data = []
     variable.location_data = []
+    variable.logger_class.logger.debug("Successfully updated site")
     
 
     
