@@ -27,7 +27,7 @@ class variable():
         self.printer_id = os.getenv('ID',"1")
         
     def read_env(self):
-        print("running")
+        print("Getting Environmental Variables")
         env_file_name = os.getenv('ENV_FILE',"")
         if(not os.path.isfile(env_file_name)):
             print("file {} not found".format(env_file_name))
