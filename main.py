@@ -9,6 +9,8 @@ import os
 #inisitalize variable
 from utils.variable import variable
 variable_instance = variable()
+variable_instance.read_env()
+
 
 #initialize logging
 from utils.logging import logger
