@@ -39,7 +39,6 @@ def get_temperature(variable):
     else:
         variable.logger_class.logger.debug("Retrived Octoprint Temperature Information")
     
-
     if(variable.status!="printing"):
         variable.logger_class.logger.debug("Skipping setting print Temperature Information")
         return
