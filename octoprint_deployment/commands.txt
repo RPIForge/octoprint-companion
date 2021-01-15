@@ -1,0 +1,22 @@
+Master Steps (Ubuntu 20.04):
+sudo snap install microk8s --classic # install microk8s
+microk8s enable dns dashboard storage registry #enable the addons
+
+token=$(sudo microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1) #get dashboard token name
+microk8s kubectl -n kube-system describe secret $token # set dashboard token
+sudo microk8s kubectl describe secret -n kube-system $(sudo microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1) #view token
+
+##run this when you want to access the dashboard
+sudo microk8s kubectl port-forward -n kube-system service/kubernetes-dashboard 10443:443 --address 0.0.0.0 # make dashboard avaiable to the public
+
+#get install location from here
+sudo microk8s.add-node
+
+#Assign nodes to printers like this 
+sudo microk8s kubectl label nodes p2 printer=Alpha
+
+Slave Stsp (Ubuntu 20.04)
+##you have to first update firmware on raspi
+sudo snap install microk8s --classic
+sudo microk8s.join <output from master>
+
