@@ -1,5 +1,5 @@
 # octoprint-companion
-This is the repo to store the code for the octoprint script
+This is the repo to store the code for the octoprint script. This script is intented to be run along side an octoprint instance. It can also send data to a endpoint and even upload files to a s3 resource. This can be configured via enviromental variables.
 
 ## Install
 
@@ -16,3 +16,4 @@ Then use the following command to get the container id. The container name shoul
 `docker ps`
 
 Then take that container id and run the following command to get the octoprint API key that is stored in the container.
+
