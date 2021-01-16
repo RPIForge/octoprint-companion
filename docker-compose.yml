@@ -11,13 +11,19 @@ services:
       - octoprint:/octoprint # persist data even if container shuts down
     ports:
       - "5000:5000"
+    healthcheck:
+            test: ["CMD", "curl", "-f", "octoprint:5000"]
+            interval: 5s
+            timeout: 10s
+            retries: 5
 
   companion:
     build: .
     image: companion
     command: python main.py
     depends_on:
-      - octoprint
+            octoprint:
+                    condition: service_healthy
     environment:
       - ENV_FILE=/config/octoprint.env
       - OCTOPRINT_IP=octoprint
