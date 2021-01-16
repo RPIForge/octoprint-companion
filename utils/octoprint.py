@@ -30,6 +30,7 @@ class octoprint():
         
         self.variable.logger_class.logger.info("Finished Initalizing Octoprint Class")
         
+        print(self.api_key)
         
     
     def __str__(self):

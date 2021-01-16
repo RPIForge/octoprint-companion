@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: alpha-deployment
+        labels:
+                printer: alpha
+spec:
+        replicas: 1
+        selector:
+                matchLabels:
+                        printer: alpha
+        template:
+                metadata:
+                        labels:
+                                printer: alpha
+                spec:
+                        containers:
+                        - name: alpha-octo
+                          image: octoprint/octoprint
+                          ports:
+                          - containerPort: 80
+                          
+

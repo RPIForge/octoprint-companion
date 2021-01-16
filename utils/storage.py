@@ -23,9 +23,9 @@ class s3():
         self.logger = self.variable.logger_class.logger
         
         
-        user = os.getenv('S3_USER',"user")
-        secret = os.getenv('S3_KEY',"123456789")
-        ip = os.getenv('S3_IP',"192.168.1.10")
+        user = os.getenv('S3_USER',"")
+        secret = os.getenv('S3_KEY',"")
+        ip = os.getenv('S3_IP',"127.0.0.1")
         port = os.getenv('S3_PORT',"8000")
         
         session = boto3.session.Session()

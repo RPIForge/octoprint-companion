@@ -31,7 +31,7 @@ class website():
         for ip in ip_list:
             try:
                 ip = ip.strip()
-                if(ip is ''):
+                if(ip == ''):
                     continue
                 new_ip = socket.gethostbyname(ip)
                 valid_ip_list.append(new_ip)
@@ -45,7 +45,7 @@ class website():
         valid_port_list = []
         for port in port_list:
             port = port.strip()
-            if(port is ''):
+            if(port == ''):
                 continue
             valid_port_list.append(port)
         
