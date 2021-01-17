@@ -2,10 +2,9 @@ version: "3.8"
    
 services:
   octoprint:
-    build: ./octoprint_config/.
+    build: ./octoprint-octoprint/.
     image: octoprint/octoprint
     restart: unless-stopped
-    command: /startup.sh
     volumes:
       - config:/config
       - octoprint:/octoprint # persist data even if container shuts down
@@ -18,9 +17,8 @@ services:
             retries: 5
 
   companion:
-    build: ./companion/
+    build: ./octoprint-companion/
     image: companion
-    command: python main.py
     depends_on:
             octoprint:
                     condition: service_healthy

@@ -7,3 +7,4 @@ COPY octoprint-users.yaml /octoprint/octoprint/users.yaml
 RUN pip install -r /plugins.txt 
 
 RUN chmod +x /startup.sh
+CMD ["/startup.sh"] #ran on container startup
