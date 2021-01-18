@@ -30,7 +30,9 @@ class octoprint():
         
         self.variable.logger_class.logger.info("Finished Initalizing Octoprint Class")
         
-    
+        if(self.get_status_message() is None):
+            raise ValidationError("Octoprint Config not valid")
+
     def __str__(self):
         return f"octoprint at {self.ip}:{self.port}"
         
