@@ -19,7 +19,15 @@ variable_instance.logger_class = logger_instance
 
 #initialize octoprint companion
 from utils.octoprint import octoprint
-octoprint_instance = octoprint(variable_instance)
+while(True):
+    try:
+        #try to get octoprint instance
+        octoprint_instance = octoprint(variable_instance)
+        break
+    except:
+        #if unable to reach octoprint reread variables
+        variable_instance.read_env()
+
 variable_instance.octoprint_class = octoprint_instance
 
 #initialize storage companion
