@@ -3,25 +3,22 @@ version: "3.8"
 services:
   octoprint:
     build: ./octoprint-octoprint/.
-    image: octoprint/octoprint
+    image: "local/octoprint"
     restart: unless-stopped
+    environment:
+      - ENV_FILE=/config/octoprint.env
     volumes:
       - config:/config
       - octoprint:/octoprint # persist data even if container shuts down
     ports:
       - "5000:5000"
-    healthcheck:
-            test: ["CMD", "curl", "-f", "octoprint:5000"]
-            interval: 5s
-            timeout: 10s
-            retries: 5
 
   companion:
     build: ./octoprint-companion/.
-    image: companion
+    image: "local/companion"
     depends_on:
-            octoprint:
-                    condition: service_healthy
+      - octoprint
+                    #        condition: service_healthy
     environment:
       - ENV_FILE=/config/octoprint.env
       - OCTOPRINT_IP=octoprint

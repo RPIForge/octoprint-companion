@@ -1,8 +1,11 @@
 #!/bin/bash
-echo "getting key"
 
-KEY=$(cat /octoprint/octoprint/config.yaml | grep key| cut -d ":" -f2 | xargs)
-echo "OCTOPRINT_KEY=$KEY">/config/octoprint.env
+echo "starting key script"
+exec /key.sh &
 
-sleep 1000
+echo "starting octoprint"
+
+sleep 10000
 exec "/usr/local/bin/python /usr/local/bin/octoprint serve --iknowwhatimdoing --host 0.0.0.0 --port 5000 --basedir /octoprint/octoprint"
+
+
