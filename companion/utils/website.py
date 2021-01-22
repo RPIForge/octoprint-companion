@@ -5,6 +5,10 @@
 #octoprint imports
 import utils.communication
 
+#time imports
+from utils.utils import get_now_str
+
+
 #general imports
 import os
 import socket
@@ -58,7 +62,7 @@ class website():
     def make_post_request(self,endpoint, paramaters, data):
         try:
             headers = {'X-API-Key':self.api_key} 
-            return utils.communication.post_request(self.get_url(i)+endpoint, paramaters, headers, json.dumps(data)))
+            return utils.communication.post_request(self.get_url()+endpoint, paramaters, headers, json.dumps(data))
         except ConnectionError as ex:
             self.logger.error("Unable to reach {}".format(ip))
             self.logger.error(ex)

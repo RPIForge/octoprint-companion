@@ -15,13 +15,13 @@ import os
 from utils.variable import variable
 variable_instance = variable()
 
-#update variables from env file
-variable_instance.read_env()
-
 #initialize logging
 from utils.logging import logger
 logger_instance = logger(variable_instance)
 variable_instance.logger_class = logger_instance
+
+#update variables from env file
+variable_instance.read_env()
 
 #initialize octoprint companion
 from utils.octoprint import octoprint

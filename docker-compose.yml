@@ -2,8 +2,9 @@ version: "3.8"
    
 services:
   octoprint:
-    build: ./octoprint-octoprint/.
+    build: ./octoprint/.
     image: "local/octoprint"
+    container_name: octoprint
     restart: unless-stopped
     environment:
       - ENV_FILE=/config/octoprint.env
@@ -14,8 +15,9 @@ services:
       - "5000:5000"
 
   companion:
-    build: ./octoprint-companion/.
+    build: ./companion/.
     image: "local/companion"
+    container_name: companion
     restart: unless-stopped
     depends_on:
       - octoprint

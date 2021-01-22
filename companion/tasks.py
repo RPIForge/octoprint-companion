@@ -164,13 +164,12 @@ def update_website(variable):
     #log start of status
     variable.logger_class.logger.info("Updating Website Data")
 
-    response_list = variable.website_class.send_data(variable.machine_data,variable.print_data,variable.temperature_data,variable.location_data)
-    for response in response_list:
-        if(not response):
-            variable.logger_class.logger.error("Failed to update site with Octoprint data")
-            return
-        else:
-            variable.logger_class.logger.info("Successfully updated site")
+    response = variable.website_class.send_data(variable.machine_data,variable.print_data,variable.temperature_data,variable.location_data)
+    if(not response):
+        variable.logger_class.logger.error("Failed to update site with Octoprint data")
+        return
+    else:
+         variable.logger_class.logger.info("Successfully updated site")
 
     variable.machine_data = {}
     variable.print_data = {}

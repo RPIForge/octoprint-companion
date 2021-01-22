@@ -33,7 +33,11 @@ class variable():
         
     def read_env(self):
         #get logger and file name
-        log = logging.getLogger('general_logger')
+        if(self.logger_class is None):
+            log = logging.getLogger('general_logger')
+        else:
+            log = self.logger_class.logger
+
         env_file_name = os.getenv('ENV_FILE',None)
         
         #if no file provided then skip
