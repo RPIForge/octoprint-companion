@@ -1,13 +1,13 @@
 FROM octoprint/octoprint:latest 
-COPY startup.sh /startup.sh
-COPY key.sh /key.sh
+
 COPY plugins.txt /plugins.txt
+RUN /usr/local/bin/python -m pip --disable-pip-version-check install  -r /plugins.txt --no-cache-dir
 
 COPY octoprint-config.yaml /octoprint/octoprint/config.yaml
 COPY octoprint-users.yaml /octoprint/octoprint/users.yaml
-RUN pip install -r /plugins.txt 
+COPY startup.py /startup.py
+RUN ["python", "/startup.py"]
 
-RUN chmod +x /startup.sh
-RUN chmod +x /key.sh
 
-CMD ["/startup.sh"] #ran on container startup
+#ENTRYPOINT ["/startup.sh"] #ran on container startup
+

@@ -14,12 +14,9 @@ import uuid
 import boto3
 
 ##Influx Imports
-#Influx Client
-from influx_client import InfluxDBClient, Point
-
 #Influx Writers
+from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
-
 
 class s3():
     s3_resource = None
@@ -105,7 +102,7 @@ class influx():
    
     #accessors
     influx_write = None
-    influx_query - None
+    influx_query = None
 
     #general
     variable = None
@@ -122,16 +119,9 @@ class influx():
 
         #connect to influx
         self.logger.info("Connecting to InfluxDB")
-        self.influx_client = InfluxDBClient(host=ip, port=port, token=token)
+        self.influx_client = InfluxDBClient(url=ip+":"+str(port), token=token)
         self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
-
-        try:
-            self.influx_client.get_list_database() # test connection
-            self.logger.info("Sucesfully connected to database")
-        except:
-            raise ValueError("Unable to Connect to Influx")
-
 
 
     def write(self, name, bucket, time, tags, fields):
@@ -147,7 +137,7 @@ class influx():
         for tag in tags:
             data_point.tag(tag[0], str(tag[1]))
         
-        for field in fields
+        for field in fields:
             data_point.tag(tag[0], float(tag[1]))
         
         try:

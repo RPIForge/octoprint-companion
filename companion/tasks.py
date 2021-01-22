@@ -69,6 +69,7 @@ def get_location(variable):
     #get printer status
     octoprint = variable.octoprint_class
     layer_information = octoprint.get_layer_information()
+    
     if(not layer_information):
         variable.logger_class.logger.error("Failed to get Octoprint Layer Information")
         return
@@ -76,6 +77,7 @@ def get_location(variable):
         variable.logger_class.logger.debug("Retrived Octoprint Layer Information")
 
     height_information = octoprint.get_printer_height()
+    
     if(not layer_information):
         variable.logger_class.logger.error("Failed to get Octoprint Height Information")
         return
@@ -86,11 +88,10 @@ def get_location(variable):
 
     #sending data to s3
     field_list = []
-    for pair in height_information
+    for pair in height_information:
         field_list.append((pair, height_information[pair]))
     
-    
-    variable.influx_class.write('location','location_information',get_now_str(),)
+    #variable.influx_class.write('location','location_information',get_now_str(),)
 
 
     #updated

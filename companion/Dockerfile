@@ -6,4 +6,5 @@ RUN pip install -r requirements.txt
 COPY . /companion/
 RUN chmod +x ./wait-for-it
 CMD ["./wait-for-it", "octoprint:5000"] #wait for octoprint to start up
+CMD ["./wait-for-it", "influx:8086"] #wait for influx to start up
 CMD ["python","main.py"] #ran when actually starting the container
