@@ -1,4 +1,9 @@
+#
+# Variable File. This file holds the variable class which is used for syncing instances/variables accross threads
+#
+
 import os
+import logging
 
 #Class for syncing variables
 class variable():
@@ -27,17 +32,26 @@ class variable():
         self.printer_id = os.getenv('ID',"1")
         
     def read_env(self):
-        print("Getting Environmental Variables")
-        env_file_name = os.getenv('ENV_FILE',"")
-        if(not os.path.isfile(env_file_name)):
-            print("file {} not found".format(env_file_name))
+        #get logger and file name
+        log = logging.getLogger('general_logger')
+        env_file_name = os.getenv('ENV_FILE',None)
+        
+        #if no file provided then skip
+        if(env_file_name is None):
             return
-
+        
+        #try to find file
+        log.info("Looking for file {}".format(env_file_name))
+        if(not os.path.isfile(env_file_name)):
+            log.error("ENV file {} not found".format(env_file_name))
+            return
+        
+        #read each line in file
         env_file = open(env_file_name, 'r')
         for line in env_file.readlines():
             pair = line.split("=")
             key = pair[0]
             value = pair[1]
-            print("setting key: {} value: {}".format(key,value))
+            log.info("setting key: {} value: {}".format(key,value))
             os.environ[key] = value.strip()
         return

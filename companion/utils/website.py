@@ -1,3 +1,7 @@
+#
+# Website File. This file holds all of the code for pushing to the website. It is abstracted so that it is sent a one large json
+#
+
 #octoprint imports
 import utils.communication
 
@@ -5,15 +9,14 @@ import utils.communication
 import os
 import socket
 import json
-import datetime
 
 #Class for syncing variables
 class website():
-    ip_list = None
-    port_list = None
+    ip = None
+    port = None
     api_key = None
     
-    
+    #generic variables
     variable = None
     logger = None
     def __init__(self, variable_class):
@@ -22,77 +25,49 @@ class website():
         self.logger.info("Initalizing Website Class")
         
         ip_string = os.getenv('SITE_IP',"localhost")
+        ip = ip_string.strip()
+        try:
+            new_ip = socket.gethostbyname(ip)
+            self.ip = new_ip
+        except socket.gaierror:
+            self.logger.error("{} is not a valid ip or hostname for website".format(ip))
 
-        #get list of ip address
-        ip_list = ip_string.split(',')
-        valid_ip_list = []
-
-        #validate each ip in list.
-        for ip in ip_list:
-            try:
-                ip = ip.strip()
-                if(ip == ''):
-                    continue
-                new_ip = socket.gethostbyname(ip)
-                valid_ip_list.append(new_ip)
-            except socket.gaierror:
-                self.logger.error("{} is not a valid ip or hostname for website".format(ip))
-
-        self.ip_list = valid_ip_list
-
+        #get list of port numbers
         port_string = os.getenv('SITE_PORT',"8000")
-        port_list = port_string.split(',')
-        valid_port_list = []
-        for port in port_list:
-            port = port.strip()
-            if(port == ''):
-                continue
-            valid_port_list.append(port)
+        self.port = port_string.strip()
         
-        self.port_list = valid_port_list
-
-        if(len(self.ip_list) != len(self.port_list)):
-            for i in range(len(self.port_list)-1,len(self.ip_list)):
-                self.logger.error("{} does not have a port. Defaulting to 8000".format(self.ip_list[i]))
-                self.port_list.append('8000')
-
+        
+        #get the api key
         self.api_key = os.getenv('SITE_KEY',"test_key")
         self.logger.info("Finished initalizing Website Class")
 
-    
-    def get_url(self, loc):
-        return "http://{}:{}".format(self.ip_list[loc],self.port_list[loc])
+    #format url    
+    def get_url(self):
+        return "http://{}:{}".format(self.ip, self.port)
     
     def make_get_request(self,endpoint, dictionary):
-        output_array = []
-        for i in range(len(self.ip_list)):
-            ip = self.ip_list[i]
-            try:
-                headers = {'X-Api-Key':self.api_key}
-                output_array.append(utils.communication.get_json(self.get_url(i)+endpoint, dictionary, headers))
-            except ConnectionError as ex:
-                self.logger.error("Unable to reach {}".format(ip))
-                self.logger.error(ex)
-                output_array.append(None)
-        return output_array
+        try:
+            headers = {'X-Api-Key':self.api_key}
+            return utils.communication.get_json(self.get_url()+endpoint, dictionary, headers)
+        except ConnectionError as ex:
+            self.logger.error("Unable to reach {}".format(ip))
+            self.logger.error(ex)
+        
+            return None
     
     def make_post_request(self,endpoint, paramaters, data):
-        output_array = []
-        for i in range(len(self.ip_list)):
-            ip = self.ip_list[i]
-            try:
-                headers = {'X-API-Key':self.api_key} 
-                output_array.append(utils.communication.post_request(self.get_url(i)+endpoint, paramaters, headers, json.dumps(data)))
-            except ConnectionError as ex:
-                self.logger.error("Unable to reach {}".format(ip))
-                self.logger.error(ex)
-                output_array.append(None)
-                
-        return output_array
+        try:
+            headers = {'X-API-Key':self.api_key} 
+            return utils.communication.post_request(self.get_url(i)+endpoint, paramaters, headers, json.dumps(data)))
+        except ConnectionError as ex:
+            self.logger.error("Unable to reach {}".format(ip))
+            self.logger.error(ex)
+            return None
+
             
     def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
         data_dict = {
-            'time':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            'time':get_now_str()
         }
         
         data = {}

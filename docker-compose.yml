@@ -16,9 +16,9 @@ services:
   companion:
     build: ./octoprint-companion/.
     image: "local/companion"
+    restart: unless-stopped
     depends_on:
       - octoprint
-                    #        condition: service_healthy
     environment:
       - ENV_FILE=/config/octoprint.env
       - OCTOPRINT_IP=octoprint

@@ -1,3 +1,7 @@
+#
+# Communication file. This file stores all methods that deal with HTTP requests
+#
+
 import requests
 import logging
 

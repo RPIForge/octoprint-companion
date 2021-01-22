@@ -1,4 +1,9 @@
-from datetime import datetime
+#
+# Tasks File. This file stores all the tasks that are run on a schedule
+#
+
+
+from utils.utils import get_now_str
 
 def get_end_time(variable):
     #log start of status
@@ -16,7 +21,7 @@ def get_end_time(variable):
     
     #update variable dict
     print_data = {
-        "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S")
+        "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S %Z")
     }
 
     variable.print_data.update(print_data)
@@ -46,7 +51,7 @@ def get_temperature(variable):
 
     temperature_data = {
         'data':temperature_information,
-        'time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        'time':get_now_str()
     }
 
     variable.temperature_data.append(temperature_data)
@@ -86,7 +91,7 @@ def get_location(variable):
     
     location_data = {
         'data':height_information,
-        'time':datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        'time':get_now_str()
     }
     variable.location_data.append(location_data)
     variable.logger_class.logger.debug("Added Print Location Information")

@@ -1,3 +1,8 @@
+#
+# Main File. This file initializes all classes and then starts running tasks
+#
+
+
 #schedule import
 import schedule
 import time
@@ -9,8 +14,9 @@ import os
 #inisitalize variable
 from utils.variable import variable
 variable_instance = variable()
-variable_instance.read_env()
 
+#update variables from env file
+variable_instance.read_env()
 
 #initialize logging
 from utils.logging import logger
@@ -25,7 +31,7 @@ while(True):
         octoprint_instance = octoprint(variable_instance)
         break
     except:
-        #if unable to reach octoprint reread variables
+        #if unable to reach octoprint reread variables in case of key change (used in docker-compose)
         variable_instance.read_env()
 
 variable_instance.octoprint_class = octoprint_instance

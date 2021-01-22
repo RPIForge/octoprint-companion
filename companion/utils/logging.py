@@ -1,3 +1,8 @@
+#
+# Logging File. File to initalize logger
+#
+
+
 #Impport to creater log folder if none exists
 import os
 import time

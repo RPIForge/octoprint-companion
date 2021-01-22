@@ -1,3 +1,7 @@
+#
+# Storage File. This file handles storing files in s3
+#
+
 #for sys enviroment
 import os
 
@@ -6,9 +10,6 @@ import boto3
 
 #random string creation
 import uuid
-
-#current time 
-import datetime
 
 class s3():
     s3_resource = None
@@ -22,18 +23,19 @@ class s3():
         self.variable = variable_class
         self.logger = self.variable.logger_class.logger
         
-        
+        #get env variables 
         user = os.getenv('S3_USER',"")
         secret = os.getenv('S3_KEY',"")
         ip = os.getenv('S3_IP',"127.0.0.1")
         port = os.getenv('S3_PORT',"8000")
         
+        #create session
         session = boto3.session.Session()
         
         try:
             self.logger.info("Connecting to s3 resource")
 
-
+            #create connection to s3 resource
             self.s3_resource = session.resource(
                 service_name="s3",
                 aws_access_key_id=user,
@@ -42,9 +44,11 @@ class s3():
                 endpoint_url='http://{}:{}'.format(ip,port),
             ) 
             
+            #get bucket
             bucket_name = '{}'.format(self.variable.name)
             self.s3_bucket = self.s3_resource.Bucket(name=bucket_name)
             
+            #if bucket isnt in s3 then create one
             if(self.s3_bucket not in self.s3_resource.buckets.all()):
                 self.s3_bucket = self.s3_resource.create_bucket(Bucket=bucket_name)
                 

@@ -1,3 +1,6 @@
+#
+# Octoprint File. This file holds all the code for connecting to the octoprint instance.
+#
 
 #import helper modules
 import os
@@ -9,7 +12,8 @@ import hashlib
 from  requests.exceptions import ConnectionError
 
 #import current_time
-import datetime
+from utils.utils import get_now_time, get_now_str
+
 class octoprint():
     api_key = None
     ip = None
@@ -80,7 +84,7 @@ class octoprint():
                 return None
                 
             seconds_remaining = int(response["progress"]["printTimeLeft"])
-            current_time = datetime.datetime.now()
+            current_time = get_now_time()
             end_time = current_time + datetime.timedelta(seconds=seconds_remaining)
             return end_time
             
@@ -127,7 +131,7 @@ class octoprint():
 
         layer_iformation = layer_iformation["layer"]
         output_information = {
-            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "time": get_now_str(),
             "current_layer": layer_iformation["current"],
             "max_layer": layer_iformation["total"]
         }    
@@ -141,7 +145,7 @@ class octoprint():
 
         layer_iformation = layer_iformation["height"]
         output_information = {
-            "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "time": get_now_str(),
             "current_height": layer_iformation["current"],
             "max_height": layer_iformation["total"]
         }     
