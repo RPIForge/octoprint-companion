@@ -84,6 +84,15 @@ def get_location(variable):
     
     height_information.update(layer_information)
 
+    #sending data to s3
+    field_list = []
+    for pair in height_information
+        field_list.append((pair, height_information[pair]))
+    
+    
+    variable.influx_class.write('location','location_information',get_now_str(),)
+
+
     #updated
     if(variable.status!="printing"):
         variable.logger_class.logger.debug("Skipping Getting Octoprint Location Information")

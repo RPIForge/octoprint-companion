@@ -67,8 +67,16 @@ class website():
             self.logger.error("Unable to reach {}".format(ip))
             self.logger.error(ex)
             return None
+    
+    #get data about machine_id
+    def get_info(self,machine_id):
+        paramater_dict = {
+            'machine_id':self.variable.printer_id
+        }
 
-            
+        return self.make_get_request('/api/machine',paramater_dict)
+
+    #push octo data to website       
     def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
         data_dict = {
             'time':get_now_str()

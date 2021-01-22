@@ -2,14 +2,24 @@
 # Storage File. This file handles storing files in s3
 #
 
+##General Imports
 #for sys enviroment
 import os
 
+#random string creation
+import uuid
+
+##S3 Imports
 #s3 resource
 import boto3
 
-#random string creation
-import uuid
+##Influx Imports
+#Influx Client
+from influx_client import InfluxDBClient, Point
+
+#Influx Writers
+from influxdb_client.client.write_api import SYNCHRONOUS
+
 
 class s3():
     s3_resource = None
@@ -87,10 +97,67 @@ class s3():
             return ""
         
        
-        
 
+class influx():
+    #General
+    influx_client = None
+    influx_org = None
+   
+    #accessors
+    influx_write = None
+    influx_query - None
+
+    #general
+    variable = None
+    logger = None
+    def __init__(self,variable_class):
+        self.variable = variable_class
+        self.logger = self.variable.logger_class.logger
+
+        #get env variables
+        ip = os.getenv('INFLUX_IP',"influx")
+        port = os.getenv('INFLUX_PORT',"8086")
+        token = os.getenv('INFLUX_TOKEN',"")
+        org = os.getenv('INFLUX_ORG',"forge")
+
+        #connect to influx
+        self.logger.info("Connecting to InfluxDB")
+        self.influx_client = InfluxDBClient(host=ip, port=port, token=token)
+        self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
+        self.influx_query = self.influx_client.query_api()
+
+        try:
+            self.influx_client.get_list_database() # test connection
+            self.logger.info("Sucesfully connected to database")
+        except:
+            raise ValueError("Unable to Connect to Influx")
+
+
+
+    def write(self, name, bucket, time, tags, fields):
+        self.logger.debug("writting to influxdb")
         
+        #create data_point
+        data_point = Point(name)
+        
+        #set time
+        data_point.time(time.isoformat())
+
+        #assign tags
+        for tag in tags:
+            data_point.tag(tag[0], str(tag[1]))
+        
+        for field in fields
+            data_point.tag(tag[0], float(tag[1]))
+        
+        try:
+            self.influx_write(bucket, self.influx_org, data_point)
+            self.logger.debug("Successfully wrote to influx bucket {}".format(bucket))
+        except:
+            self.logger.error("Unable to write to influx bucket {}".format(bucket))
     
+
+
         
         
     
