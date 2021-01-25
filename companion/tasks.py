@@ -46,9 +46,10 @@ def get_temperature(variable):
     
     #update influx
     tag_list = variable.influx_class.generate_tags()
+    
     for tool in temperature_information:
         #get names
-        measurement_name = "{}'s {} temperature",format(tool)
+        measurement_name = "{}'s {} temperature".format(variable.name, tool)
         
         #get fields
         field_list = []
