@@ -24,10 +24,12 @@ class logger():
         self.logger = logging.getLogger('general_logger')
         
         level_var = os.getenv('LOG',"INFO")
-        if(level_var == "INFO"):
-            level = logging.INFO
-        elif(level_var == "DEBUG"):
+        if(level_var == "DEBUG"):
             level = logging.DEBUG
+        elif(level_var == "INFO"):
+            level = logging.INFO
+        elif(level_var == "WARN"):
+            level = logging.WARN
         elif(level_var == "ERROR"):
             level = logging.ERROR
 

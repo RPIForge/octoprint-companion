@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2.1"
    
 services:
   octoprint:
@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     environment:
       - ENV_FILE=/config/octoprint.env
+    devices:
+      - /dev/ttyAMA0:/dev/ttyAMA0
     volumes:
       - config:/config
       - octoprint-data:/octoprint # persist data even if container shuts down
