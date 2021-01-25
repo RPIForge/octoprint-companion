@@ -45,6 +45,9 @@ class website():
         self.api_key = os.getenv('SITE_KEY',"test_key")
         self.logger.info("Finished initalizing Website Class")
 
+        #udpate date 
+        self.update_info()
+        
     #format url    
     def get_url(self):
         return "http://{}:{}".format(self.ip, self.port)
@@ -67,8 +70,29 @@ class website():
             self.logger.error("Unable to reach {}".format(ip))
             self.logger.error(ex)
             return None
+    
+    #get data about machine_id
+    def get_info(self):
+        paramater_dict = {
+            'machine_id':self.variable.printer_id
+        }
 
-            
+        return self.make_get_request('/api/machine',paramater_dict)
+    
+    def update_info(self):
+        #get updated data from site
+        machine_info = self.get_info()
+        if(machine_info):
+            self.variable.name = machine_info["name"]
+            self.variable.type = machine_info["type"]
+            self.logger.info("Gathered Data from site")
+            return True
+        else:
+            self.logger.error("Failed to get printer data from site")
+            return False
+
+
+    #push octo data to website       
     def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
         data_dict = {
             'time':get_now_str()

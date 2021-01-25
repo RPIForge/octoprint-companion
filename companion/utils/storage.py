@@ -2,14 +2,21 @@
 # Storage File. This file handles storing files in s3
 #
 
+##General Imports
 #for sys enviroment
 import os
 
+#random string creation
+import uuid
+
+##S3 Imports
 #s3 resource
 import boto3
 
-#random string creation
-import uuid
+##Influx Imports
+#Influx Writers
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 
 class s3():
     s3_resource = None
@@ -87,10 +94,92 @@ class s3():
             return ""
         
        
-        
+
+class influx():
+    #General
+    influx_client = None
+    influx_org = None
+   
+    #accessors
+    influx_write = None
+    influx_query = None
+    
+
+    #bucket names
+    temperature_bucket = None
+    location_bucket = None
+
+    #general
+    variable = None
+    logger = None
+    def __init__(self,variable_class):
+        self.variable = variable_class
+        self.logger = self.variable.logger_class.logger
+
+
+        #get env variables
+        ip = os.getenv('INFLUX_IP',"influx")
+        port = os.getenv('INFLUX_PORT',"8086")
+        token = os.getenv('INFLUX_TOKEN',"")
+        self.influx_org = os.getenv('INFLUX_ORG',"forge")
 
         
+
+        #connect to influx
+        self.logger.info("Connecting to InfluxDB")
+        self.influx_client = InfluxDBClient(url=ip+":"+str(port), token=token)
+        self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
+        self.influx_query = self.influx_client.query_api()
+
+        #get bucket information
+        self.temperature_bucket = os.getenv('TEMPERATURE_BUCKET',"temperature_data")
+        self.location_bucket = os.getenv('LOCATION_BUCKET',"location_data")
+        
+
+    def generate_tags(self):
+        tag_list = []
+        tag_list.append(('machine_name',self.variable.name))
+        tag_list.append(('machine_type',self.variable.type))
+        tag_list.append(('machine_id',self.variable.printer_id))
+
+        if(self.variable.job is not None and self.variable.job_id is not None):
+            tag_list.append(('job',self.variable.job))
+            tag_list.append(('job_id',self.variable.job_id))
+        
+        return tag_list
+
+    def write(self, name, bucket, time, tags, fields):
+        self.logger.debug("writting to influxdb")
+        
+        #create data_point
+        data_point = Point(name)
+        
+        #set time
+        data_point.time(time)
+
+        #assign tags
+        for tag in tags:
+            data_point.tag(tag[0], str(tag[1]))
+        
+        for field in fields:
+            data_point.tag(tag[0], float(tag[1]))
+        
+        print(data_point)
+        print(self.influx_org)
+        print(fields)
+        print(tags)
+        try:
+            self.influx_write.write(bucket, self.influx_org, data_point)
+            self.logger.debug("Successfully wrote to influx bucket {}".format(bucket))
+            return True
+        except Exception as e:
+            self.logger.error("Unable to write to influx bucket {}".format(bucket))
+            self.logger.error(e)
+            return False
+
     
+
+
         
         
     

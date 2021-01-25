@@ -36,10 +36,14 @@ while(True):
 
 variable_instance.octoprint_class = octoprint_instance
 
-#initialize storage companion
+#initialize storage companions
 from utils.storage import s3
 s3_instance = s3(variable_instance)
 variable_instance.s3_class = s3_instance
+
+from utils.storage import influx
+influx_instance = influx(variable_instance)
+variable_instance.influx_class = influx_instance
 
 #initialize website companion
 from utils.website import website

@@ -2,7 +2,7 @@ accessControl:
     salt: FOLehZNk8y89oxdKsbA69ahIYExSLMfJ
     userfile: /octoprint/octoprint/users.yaml
 api:
-    key: 
+    key: <key>
 plugins:
     announcements:
         _config_version: 1

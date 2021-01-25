@@ -10,16 +10,20 @@ class variable():
     #info variables
     name = None
     printer_id = None
+    type = None
+
     
     #util classes
     octoprint_class = None
     s3_class = None
+    influx_class = None
     logger_class = None
     website_class = None
     
     #print status
     status = "Offline"
-
+    job = None
+    job_id = None
 
     #print data
     temperature_data = []
@@ -29,6 +33,7 @@ class variable():
     
     def __init__(self):
         self.name = os.getenv('NAME',"generic-test")
+        self.type = os.getenv('NAME',"printer")
         self.printer_id = os.getenv('ID',"1")
         
     def read_env(self):
