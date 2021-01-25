@@ -1,6 +1,8 @@
 accessControl:
     salt: FOLehZNk8y89oxdKsbA69ahIYExSLMfJ
     userfile: /octoprint/octoprint/users.yaml
+    localNetworks:
+    - 172.16.0.0/12
 api:
     key: <key>
 plugins:
