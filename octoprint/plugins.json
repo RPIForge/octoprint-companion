@@ -1,0 +1,36 @@
+[
+	{
+    "id": "DisplayLayerProgress",
+    "published": "2018-04-09 00:00:00 -0500",
+    "title": "DisplayLayerProgress",
+    "description": "Displays the Layer, Progress and other data on \"Printer-Display\", \"NavBar\", \"BrowserTab-Title\" and in the Browser as a simulated \"Printer-Display\"",
+    "archive": "https://github.com/OllisGit/OctoPrint-DisplayLayerProgress/releases/latest/download/master.zip",
+    "author": "Olli",
+    "homepage": "https://github.com/OllisGit/OctoPrint-DisplayLayerProgress",
+    "page": "https://plugins.octoprint.org/plugins/DisplayLayerProgress/",
+    "compatibility": {
+      "octoprint": [
+        "1.3.10",
+        "1.4.0"
+      ],
+      "os": [],
+      "python": ">=2.7,<4"
+    },
+    "license": "AGPLv3",
+    "image": "https://github.com/OllisGit/OctoPrint-DisplayLayerProgress/raw/master/screenshots/navbar.jpg",
+    "abandoned": false,
+    "github": {
+      "latest_release": {
+        "name": "V1.24.0",
+        "date": "2020-10-07 20:31:08 +0000",
+        "tag": "1.24.0"
+      },
+      "releases": 56,
+      "last_push": "2021-01-13 09:15:25 +0000",
+      "stars": 69,
+      "issues": {
+        "open": 16,
+        "closed": 166
+      }
+    }
+]
