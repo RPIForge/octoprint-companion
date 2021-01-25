@@ -127,7 +127,7 @@ class influx():
 
         #connect to influx
         self.logger.info("Connecting to InfluxDB")
-        self.influx_client = InfluxDBClient(url=ip+":"+str(port), token=token)
+        self.influx_client = InfluxDBClient(url="http://"+ip+":"+str(port), token=token)
         self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
 
@@ -162,12 +162,9 @@ class influx():
             data_point.tag(tag[0], str(tag[1]))
         
         for field in fields:
-            data_point.tag(tag[0], float(tag[1]))
+            data_point.field(field[0], float(field[1]))
         
-        print(data_point)
-        print(self.influx_org)
-        print(fields)
-        print(tags)
+
         try:
             self.influx_write.write(bucket, self.influx_org, data_point)
             self.logger.debug("Successfully wrote to influx bucket {}".format(bucket))

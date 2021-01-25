@@ -26,6 +26,7 @@ services:
     environment:
       - ENV_FILE=/config/octoprint.env
       - OCTOPRINT_IP=octoprint
+      - INFLUX_TOKEN=EtdHkL0cNtn8350KURoB7kFCVcJTKhj8jHoMkvoNonOOxExURSDlpzHgPY6kV5tVux69hb1qlkLV-XIhpoSz0A==
     volumes:
       - config:/config
 
