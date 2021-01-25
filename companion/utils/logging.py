@@ -32,6 +32,8 @@ class logger():
             level = logging.WARN
         elif(level_var == "ERROR"):
             level = logging.ERROR
+        else:
+            level = logging.ERROR
 
         #Set logger levels
         self.logger.setLevel(level)

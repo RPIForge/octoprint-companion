@@ -2,18 +2,27 @@
 import os
 import uuid
 from builtins import bytes
-
-#function to generate key
+#
+##function to generate key
 def generate_api_key():
     return "".join("%20X" % z for z in bytes(uuid.uuid4().bytes))
 
 
 #generate api key
 api_key = generate_api_key()
-            
-#set octoprint api key
-os.system('octoprint config set api.key "{}"'.format(api_key))
+api_key = api_key.replace(' ','')  
 
+#set octoprint api key
+output = os.popen('cat /octoprint/octoprint/config.yaml | grep key| cut -d ":" -f2 | xargs').read()
+output = output.strip()
+
+os.system("sed -i 's/<key>/{}/g' /octoprint/octoprint/config.yaml".format(api_key))
+
+output = os.popen('cat /octoprint/octoprint/config.yaml | grep key| cut -d ":" -f2 | xargs').read()
+output = output.strip()
+
+
+os.system('rm -rf /config')
 os.mkdir('/config/')
 
 #get the  config file
