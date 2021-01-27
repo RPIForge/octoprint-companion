@@ -7,6 +7,8 @@ import os
 import tempfile
 import utils.communication
 import hashlib
+import time
+import datetime
 
 #import exceptions
 from  requests.exceptions import ConnectionError
@@ -32,9 +34,11 @@ class octoprint():
         self.ip = os.getenv('OCTOPRINT_IP',"octoprint")
         self.port = os.getenv('OCTOPRINT_PORT',"5000")
         
-        self.variable.logger_class.logger.info("Finished Initalizing Octoprint Class")
+        self.logger.info("Finished Initalizing Octoprint Class")
         
         if(self.get_status_message() is None):
+            self.logger.error("Failed to connect to octoprint. Restarting in 5 seconds")
+            time.sleep(5)
             raise ValueError("Octoprint Config not valid")
 
     def __str__(self):
