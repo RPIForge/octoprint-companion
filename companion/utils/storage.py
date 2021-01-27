@@ -164,7 +164,6 @@ class influx():
         for field in fields:
             data_point.field(field[0], float(field[1]))
         
-
         try:
             self.influx_write.write(bucket, self.influx_org, data_point)
             self.logger.debug("Successfully wrote to influx bucket {}".format(bucket))
