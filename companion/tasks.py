@@ -117,15 +117,31 @@ def get_location(variable):
     ##sending data to influx
     #only send location data to influx when it is printing as DisplayLayerProgress only works while printing
 
+    #generate measure_ment name
+    measurement_name = "{}'s location".format(variable.name)
+    
+
     #generate list of tags
     tag_list = variable.influx_class.generate_tags()
 
     #organize fields
     field_list = []
-    for pair in height_information:
-        field_list.append((pair, height_information[pair]))
+    current_height = height_information["current_height"]
+    if(current_height != '-'):
+        field_list.append(('current_height',current_height))
     
-    measurement_name = "{}'s location",format(variable.name)
+    max_height = height_information["max_height"]
+    if(max_height != '-'):
+        field_list.append(('max_height',max_height))
+    
+    current_layer = height_information["current_layer"]
+    if(current_layer != '-'):
+        field_list.append(('current_layer',current_layer))
+    
+    max_layer = height_information["max_layer"]
+    if(max_layer != '-'):
+        field_list.append(('max_layer',max_layer))
+
     
     variable.influx_class.write(measurement_name,variable.influx_class.location_bucket,get_now_str(),tag_list,field_list)
 
