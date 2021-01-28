@@ -6,13 +6,8 @@ services:
     image: "local/octoprint"
     container_name: octoprint
     restart: unless-stopped
-    environment:
-      - ENV_FILE=/config/octoprint.env
     devices:
       - /dev/ttyAMA0:/dev/ttyAMA0
-    volumes:
-      - config:/config
-      - octoprint-data:/octoprint # persist data even if container shuts down
     ports:
       - "5000:5000"
 
@@ -24,16 +19,6 @@ services:
     depends_on:
       - octoprint
     environment:
-      - ENV_FILE=/config/octoprint.env
       - OCTOPRINT_IP=octoprint
       - INFLUX_TOKEN=EtdHkL0cNtn8350KURoB7kFCVcJTKhj8jHoMkvoNonOOxExURSDlpzHgPY6kV5tVux69hb1qlkLV-XIhpoSz0A==
-    volumes:
-      - config:/config
 
-volumes:
-    config:
-      driver: local
-    influx-data:
-      driver: local
-    octoprint-data:
-      driver: local
