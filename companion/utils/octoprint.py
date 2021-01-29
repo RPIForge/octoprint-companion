@@ -30,7 +30,7 @@ class octoprint():
         self.logger.info("Initalizing Octoprint Class")
         
         #init variable object
-        self.api_key = os.getenv('OCTOPRINT_KEY',"")
+        self.api_key = os.getenv('OCTOPRINT_KEY',"test")
         self.ip = os.getenv('OCTOPRINT_IP',"octoprint")
         self.port = os.getenv('OCTOPRINT_PORT',"5000")
         
