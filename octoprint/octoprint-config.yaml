@@ -9,7 +9,7 @@ accessControl:
     userfile: /octoprint/octoprint/users.yaml
     
 api:
-    key: <key>
+    key: test
 plugins:
     announcements:
         _config_version: 1

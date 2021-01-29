@@ -72,7 +72,7 @@ class octoprint():
         elif(status=="Offline"):
             return "offline"
         else:
-            return None
+            return "offline"
             
     
     def get_status_message(self):
