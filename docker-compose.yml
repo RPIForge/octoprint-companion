@@ -6,7 +6,7 @@ services:
     image: "local/octoprint:latest"
     container_name: octoprint
     restart: unless-stopped
-    device:
+    devices:
       - /dev/ttyAMA0:/dev/ttyAMA0
     ports:
       - "5000:5000"
