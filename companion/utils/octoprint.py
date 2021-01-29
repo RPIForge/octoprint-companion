@@ -30,7 +30,7 @@ class octoprint():
         self.logger.info("Initalizing Octoprint Class")
         
         #init variable object
-        self.api_key = os.getenv('OCTOPRINT_KEY',"")
+        self.api_key = os.getenv('OCTOPRINT_KEY',"test")
         self.ip = os.getenv('OCTOPRINT_IP',"octoprint")
         self.port = os.getenv('OCTOPRINT_PORT',"5000")
         
@@ -72,7 +72,7 @@ class octoprint():
         elif(status=="Offline"):
             return "offline"
         else:
-            return None
+            return "offline"
             
     
     def get_status_message(self):

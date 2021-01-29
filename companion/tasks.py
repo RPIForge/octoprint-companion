@@ -171,7 +171,7 @@ def get_status(variable):
         variable.logger_class.logger.error("Failed to get Octoprint Status")
         return
     
-    
+
     #if new status
     if(status != variable.status):
         variable.logger_class.logger.debug("Status Changed")

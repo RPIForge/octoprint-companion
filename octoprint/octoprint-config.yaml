@@ -1,10 +1,15 @@
 accessControl:
-    salt: FOLehZNk8y89oxdKsbA69ahIYExSLMfJ
-    userfile: /octoprint/octoprint/users.yaml
+    enabled: true
+    autologinLocal: true
+    autologinAs: admin
     localNetworks:
     - 172.16.0.0/12
+
+    salt: FOLehZNk8y89oxdKsbA69ahIYExSLMfJ
+    userfile: /octoprint/octoprint/users.yaml
+    
 api:
-    key: <key>
+    key: test
 plugins:
     announcements:
         _config_version: 1
