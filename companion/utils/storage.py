@@ -118,7 +118,7 @@ class influx():
 
 
         #get env variables
-        ip = os.getenv('INFLUX_IP',"influx")
+        host = os.getenv('INFLUX_URL',"http://influx")
         port = os.getenv('INFLUX_PORT',"8086")
         token = os.getenv('INFLUX_TOKEN',"")
         self.influx_org = os.getenv('INFLUX_ORG',"forge")
@@ -127,7 +127,7 @@ class influx():
 
         #connect to influx
         self.logger.info("Connecting to InfluxDB")
-        self.influx_client = InfluxDBClient(url="http://"+ip+":"+str(port), token=token)
+        self.influx_client = InfluxDBClient(url=host+":"+str(port), token=token)
         self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
 
