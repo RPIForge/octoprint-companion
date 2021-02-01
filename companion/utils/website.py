@@ -28,7 +28,7 @@ class website():
         self.logger = self.variable.logger_class.logger
         self.logger.info("Initalizing Website Class")
         
-        ip_string = os.getenv('SITE_IP',"localhost")
+        ip_string = os.getenv('SITE_URL',"http://localhost")
         ip = ip_string.strip()
         try:
             new_ip = socket.gethostbyname(ip)
@@ -50,7 +50,7 @@ class website():
         
     #format url    
     def get_url(self):
-        return "http://{}:{}".format(self.ip, self.port)
+        return "{}:{}".format(self.ip, self.port)
     
     def make_get_request(self,endpoint, dictionary):
         try:

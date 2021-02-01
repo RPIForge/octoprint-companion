@@ -3,7 +3,7 @@ version: "2.1"
 services:
   octoprint:
     build: ./octoprint/.
-    image: "local/octoprint:latest"
+    image: "forge/octoprint:latest"
     container_name: octoprint
     restart: unless-stopped
     devices:
@@ -13,7 +13,7 @@ services:
 
   companion:
     build: ./companion/.
-    image: "local/companion:latest"
+    image: "forge/companion:latest"
     container_name: companion
     restart: unless-stopped
     depends_on:
