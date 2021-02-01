@@ -3,11 +3,12 @@ version: "2.1"
 services:
   octoprint:
     build: ./octoprint/.
-    image: "local/octoprint:latest"
+    image: "forge/octoprint:latest"
     container_name: octoprint
     restart: unless-stopped
     ports:
       - "5000:5000"
+
   influx:
     image: quay.io/influxdb/influxdb:v2.0.3
     command: influxd run --bolt-path /var/lib/influxdb2/influxd.bolt --engine-path /var/lib/influxdb2/engine --store bolt
@@ -24,7 +25,7 @@ services:
 
   companion:
     build: ./companion/.
-    image: "local/companion:latest"
+    image: "forge/companion:latest"
     container_name: companion
     restart: unless-stopped
     depends_on:

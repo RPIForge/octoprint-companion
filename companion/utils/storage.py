@@ -33,7 +33,7 @@ class s3():
         #get env variables 
         user = os.getenv('S3_USER',"")
         secret = os.getenv('S3_KEY',"")
-        ip = os.getenv('S3_IP',"127.0.0.1")
+        url = os.getenv('S3_URL',"http://127.0.0.1")
         port = os.getenv('S3_PORT',"8000")
         
         #create session
@@ -48,7 +48,7 @@ class s3():
                 aws_access_key_id=user,
                 aws_secret_access_key=secret,
                 config=boto3.session.Config(signature_version='s3v4', connect_timeout=5, retries={'max_attempts': 0}),
-                endpoint_url='http://{}:{}'.format(ip,port),
+                endpoint_url='{}:{}'.format(url,port),
             ) 
             
             #get bucket
