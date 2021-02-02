@@ -33,8 +33,12 @@ class s3():
         #get env variables 
         user = os.getenv('S3_USER',"")
         secret = os.getenv('S3_KEY',"")
+<<<<<<< HEAD
         url = os.getenv('S3_URL',"http://127.0.0.1")
         port = os.getenv('S3_PORT',"8000")
+=======
+        url = os.getenv('S3_URL',"http://127.0.0.1:9000")
+>>>>>>> master
         
         #create session
         session = boto3.session.Session()
@@ -48,7 +52,7 @@ class s3():
                 aws_access_key_id=user,
                 aws_secret_access_key=secret,
                 config=boto3.session.Config(signature_version='s3v4', connect_timeout=5, retries={'max_attempts': 0}),
-                endpoint_url='{}:{}'.format(url,port),
+                endpoint_url=url,
             ) 
             
             #get bucket
@@ -118,8 +122,7 @@ class influx():
 
 
         #get env variables
-        host = os.getenv('INFLUX_URL',"http://influx")
-        port = os.getenv('INFLUX_PORT',"8086")
+        url = os.getenv('INFLUX_URL',"http://influx:8086")
         token = os.getenv('INFLUX_TOKEN',"")
         self.influx_org = os.getenv('INFLUX_ORG',"forge")
 
@@ -127,7 +130,8 @@ class influx():
 
         #connect to influx
         self.logger.info("Connecting to InfluxDB")
-        self.influx_client = InfluxDBClient(url=host+":"+str(port), token=token)
+
+        self.influx_client = InfluxDBClient(url=url, token=token)
         self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
 

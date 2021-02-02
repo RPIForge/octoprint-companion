@@ -18,8 +18,7 @@ from utils.utils import get_now_time, get_now_str
 
 class octoprint():
     api_key = None
-    ip = None
-    port = None
+    url = None
 
     variable = None
     logger = None
@@ -30,9 +29,10 @@ class octoprint():
         self.logger.info("Initalizing Octoprint Class")
         
         #init variable object
-        self.api_key = os.getenv('OCTOPRINT_KEY',"test")
-        self.ip = os.getenv('OCTOPRINT_IP',"octoprint")
-        self.port = os.getenv('OCTOPRINT_PORT',"5000")
+
+        self.api_key = os.getenv('OCTOPRINT_KEY',"")
+        self.url = os.getenv('OCTOPRINT_URL',"http://octoprint:5000")
+
         
         self.logger.info("Finished Initalizing Octoprint Class")
         
@@ -42,10 +42,10 @@ class octoprint():
             raise ValueError("Octoprint Config not valid")
 
     def __str__(self):
-        return f"octoprint at {self.ip}:{self.port}"
+        return f"octoprint at {self.url}"
         
     def get_url(self):
-        return "http://{}:{}".format(self.ip,self.port)
+        return self.url
     
     def make_get_request(self,endpoint, dictionary):
         try:

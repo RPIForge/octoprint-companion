@@ -16,8 +16,7 @@ import json
 
 #Class for syncing variables
 class website():
-    ip = None
-    port = None
+    url = None
     api_key = None
     
     #generic variables
@@ -28,17 +27,8 @@ class website():
         self.logger = self.variable.logger_class.logger
         self.logger.info("Initalizing Website Class")
         
-        ip_string = os.getenv('SITE_URL',"http://localhost")
-        ip = ip_string.strip()
-        try:
-            new_ip = socket.gethostbyname(ip)
-            self.ip = new_ip
-        except socket.gaierror:
-            self.logger.error("{} is not a valid ip or hostname for website".format(ip))
 
-        #get list of port numbers
-        port_string = os.getenv('SITE_PORT',"8000")
-        self.port = port_string.strip()
+        self.url = os.getenv('SITE_URL',"http://localhost:8000")
         
         
         #get the api key
@@ -50,8 +40,9 @@ class website():
         
     #format url    
     def get_url(self):
-        return "{}:{}".format(self.ip, self.port)
-    
+
+        return self.url
+
     def make_get_request(self,endpoint, dictionary):
         try:
             headers = {'X-Api-Key':self.api_key}
