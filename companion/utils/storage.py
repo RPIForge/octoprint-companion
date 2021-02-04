@@ -18,6 +18,11 @@ import boto3
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 
+##Disk Imports
+#h5py
+import h5py
+import numpy
+
 class s3():
     s3_resource = None
     s3_bucket = None
@@ -175,11 +180,96 @@ class influx():
 
     
 
+class disk_storage:
+    #root_group
+    file = None
+    
+    #default dataset size. Also the size to increment the resize
+    buffer_size = 1000
 
-        
-        
+    #used for traversal
+    loc_data = None
     
 
+    def __init__(self):
+        #get buffer location and size
+        file_name = os.getenv("BUFFER_LOC","temp_read.hdf5")
+        self.buffer_size = int(os.getenv("BUFFER_SIZE","1000"))
+        
+        #get mode. Create file (w+) if it doesnt exists. Read else
+        mode = 'w+'
+        if(os.path.isfile(file_name):
+            mode = 'r+'
+
+        #open file
+        self.file = h5py.File(file_name,mode)
+        
+        #initialize loc_data
+        self.loc_data = {}
+
+
+        #if data already exists set loc to correct location
+        if(len(list(self.file.keys)) != 0):
+            for key in list(self.file.keys):
+                dset = self.file[key]
+                if('loc' in dset.attrs):
+                    self.loc_data[dset.name] = dset.attrs['loc']
+                else:
+                    self.loc_data[dset.name] = 0
+
+
+    def push_data(self, data_name, array, width=4):
+        #if key has not been created create new dset
+        if(data_name not in list(self.file.keys)):
+            dset = self.file.create_dataset(data_name, (self.buffer_size,width), maxshape=(None,width),dtype=h5py.string_dtype())
+            
+            dset.attrs['loc'] = 0
+            self.loc_data[data_name] = 0
+        else:
+            dset = self.file[data_name]
+
+        #if loc is bigger than available then resize dset
+        loc = self.loc_data[data_name]
+        if(loc >= dset.size):
+            dset.resize((dset.size+self.buffer_size),width)
+
+        #update data in array
+        dset[loc] = array
+
+        dset.attrs['loc'] = loc + 1
+        self.loc_data[dset] = loc + 1
     
+    #get all of the data from the store
+    def get_data(self):
+        output_dict = {}
+
+        #for all of the datasets gather there data
+        for key in list(self.file.keys):
+            output_dict[key] = self.file[key][:self.loc_data[key]]
+        
+        return output_dict
+    
+    #clear the data from the datasets
+    def clear_data(self):
+        #for all datasets
+        for key in list(self.file.keys):
+            #get the width of the dataset
+            dset = self.file[key]
+            shape = dset.shape
+            width = shape[1]
+
+            #first shrink the dataset to the original size and then overrite any leftover data
+            numpy.resize(dset, (self.buffer_size,width))
+            dset = [b'']*width
+
+            #reset the loc
+            dset.attrs['loc'] = 0
+            
+
+
+
+
+
+        
     
     
