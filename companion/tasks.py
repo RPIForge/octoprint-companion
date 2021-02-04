@@ -26,64 +26,6 @@ def get_end_time(variable):
 
     variable.print_data.update(print_data)
     variable.logger_class.logger.debug("Updated Print end_time")
-
-def get_temperature(variable):
-    #log start of status
-    variable.logger_class.logger.debug("Getting Octoprint Temperature Information")
-    
-    if(variable.status == "offline"):
-        variable.logger_class.logger.debug("Skipping getting Octoprint Temperature Information")
-        return
-
-    #get printer temperature
-    octoprint = variable.octoprint_class
-    temperature_information = octoprint.get_temperature()
-    if(not temperature_information):
-        variable.logger_class.logger.error("Failed to get Temperature Information")
-        return
-    else:
-        variable.logger_class.logger.debug("Retrived Octoprint Temperature Information")
-    
-    #push data to the buffer
-    time_str = get_now_str()
-    for tool in temperature_information:
-        data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
-        variable.buffer_class.push_data('temperature_data',data_array)
-
-    variable.logger_class.logger.debug("Added Print Temperature Information")
-
-    
-
-
-def get_location(variable):
-    #log start of status
-    variable.logger_class.logger.debug("Getting Octoprint Location Information")
-    
-    if(variable.status != "printing"):
-        variable.logger_class.logger.debug("Skipping getting Octoprint Location Information")
-        return
-
-    #get printer location
-    octoprint = variable.octoprint_class
-    location_information = octoprint.get_location()
-    
-    if(not location_information):
-        variable.logger_class.logger.error("Failed to get Location Information")
-        return
-    else:
-        variable.logger_class.logger.debug("Retrived Octoprint Location Information")
-    
-    #push data to buffer
-    current_height = location_information["current_height"]
-    max_height = location_information["max_height"]
-    current_layer = location_information["current_layer"]
-    max_layer = location_information["max_layer"]
-
-    data_array = [get_now_str(),current_layer,max_layer,current_height,max_height]
-    self.buffer_class.push_data('location_data',data_array,width=5)
-
-    variable.logger_class.logger.debug("Added Print Location Information")
-
     
 #get pritn status
 def get_status(variable):

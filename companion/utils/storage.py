@@ -246,33 +246,40 @@ class disk_storage:
         #flush the h5py buffer to disk
         self.file.flush()
 
+    #get data from one dset
+    def get_data(self, dset):
+        return self.file[dset][:self.loc_data[dset]]
+
     #get all of the data from the store
-    def get_data(self):
+    def get_all_data(self):
         output_dict = {}
 
         #for all of the datasets gather there data
         for key in list(self.file.keys()):
-            output_dict[key] = self.file[key][:self.loc_data[key]]
+            output_dict[key] = self.get_data(key)
         
         return output_dict
     
+    #clear data for individual dset
+    def clear_data(self,dset):
+        #get dataset
+        dset = self.file[key]
+        shape = dset.shape
+        width = shape[1]
+
+        #first shrink the dataset to the original size and then overrite any leftover data
+        numpy.resize(dset, (self.buffer_size,width))
+        dset[:] = [b'']*width
+
+        #reset the loc
+        dset.attrs['loc'] = 0
+
     #clear the data from the datasets
-    def clear_data(self):
+    def clear_all_data(self):
         #for all datasets
         for key in list(self.file.keys()):
-            #get the width of the dataset
-            dset = self.file[key]
-            shape = dset.shape
-            width = shape[1]
-
-            #first shrink the dataset to the original size and then overrite any leftover data
-            numpy.resize(dset, (self.buffer_size,width))
-            dset[:] = [b'']*width
-
-            #reset the loc
-            dset.attrs['loc'] = 0
-            
-
+            self.clear_data(key) 
+    
 
 
 
