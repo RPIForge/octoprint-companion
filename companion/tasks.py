@@ -35,7 +35,7 @@ def get_temperature(variable):
         variable.logger_class.logger.debug("Skipping getting Octoprint Temperature Information")
         return
 
-    #get printer status
+    #get printer temperature
     octoprint = variable.octoprint_class
     temperature_information = octoprint.get_temperature()
     if(not temperature_information):
@@ -44,34 +44,12 @@ def get_temperature(variable):
     else:
         variable.logger_class.logger.debug("Retrived Octoprint Temperature Information")
     
-    #update influx
-    tag_list = variable.influx_class.generate_tags()
-    
+    #push data to the buffer
+    time_str = get_now_str()
     for tool in temperature_information:
-        #get names
-        measurement_name = "{}'s {} temperature".format(variable.name, tool)
-        
-        #get fields
-        field_list = []
-        field_list.append(('temperature', temperature_information[tool]["actual"]))
-        field_list.append(('temperature_goal', temperature_information[tool]["target"]))
+        data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['goal']]
+        variable.buffer_class.push_data('temperature_data',data_array)
 
-        variable.influx_class.write(measurement_name,variable.influx_class.temperature_bucket,get_now_str(),tag_list,field_list)
-
-
-
-    #only update site when printing
-    if(variable.status!="printing"):
-        variable.logger_class.logger.debug("Skipping setting print Temperature Information")
-        return
-
-
-    temperature_data = {
-        'data':temperature_information,
-        'time':get_now_str()
-    }
-
-    variable.temperature_data.append(temperature_data)
     variable.logger_class.logger.debug("Added Print Temperature Information")
 
     
@@ -81,77 +59,29 @@ def get_location(variable):
     #log start of status
     variable.logger_class.logger.debug("Getting Octoprint Location Information")
     
-    if(variable.status == "offline"):
+    if(variable.status != "printing"):
         variable.logger_class.logger.debug("Skipping getting Octoprint Location Information")
         return
 
-    #get printer status
+    #get printer location
     octoprint = variable.octoprint_class
-    layer_information = octoprint.get_layer_information()
+    location_information = octoprint.get_location()
     
-    if(not layer_information):
-        variable.logger_class.logger.error("Failed to get Octoprint Layer Information")
+    if(not location_information):
+        variable.logger_class.logger.error("Failed to get Location Information")
         return
     else:
-        variable.logger_class.logger.debug("Retrived Octoprint Layer Information")
-
-    height_information = octoprint.get_printer_height()
+        variable.logger_class.logger.debug("Retrived Octoprint Location Information")
     
-    if(not layer_information):
-        variable.logger_class.logger.error("Failed to get Octoprint Height Information")
-        return
-    else:
-        variable.logger_class.logger.debug("Retrived Octoprint Height Information")
-    
-    height_information.update(layer_information)
+    #push data to buffer
+    current_height = location_information["current_height"]
+    max_height = location_information["max_height"]
+    current_layer = location_information["current_layer"]
+    max_layer = location_information["max_layer"]
 
+    data_array = [get_now_str(),current_layer,max_layer,current_height,max_height]
+    self.buffer_class.push_data('location_data',data_array,width=5)
 
-
-    #if website/influx needs to be updated
-
-
-    if(variable.status!="printing"):
-        variable.logger_class.logger.debug("Skipping updating Octoprint Location Information")
-        return
-    
-    ##sending data to influx
-    #only send location data to influx when it is printing as DisplayLayerProgress only works while printing
-
-    #generate measure_ment name
-    measurement_name = "{}'s location".format(variable.name)
-    
-
-    #generate list of tags
-    tag_list = variable.influx_class.generate_tags()
-
-    #organize fields
-    field_list = []
-    current_height = height_information["current_height"]
-    if(current_height != '-'):
-        field_list.append(('current_height',current_height))
-    
-    max_height = height_information["max_height"]
-    if(max_height != '-'):
-        field_list.append(('max_height',max_height))
-    
-    current_layer = height_information["current_layer"]
-    if(current_layer != '-'):
-        field_list.append(('current_layer',current_layer))
-    
-    max_layer = height_information["max_layer"]
-    if(max_layer != '-'):
-        field_list.append(('max_layer',max_layer))
-
-    
-    variable.influx_class.write(measurement_name,variable.influx_class.location_bucket,get_now_str(),tag_list,field_list)
-
-
-    #update website data
-    location_data = {
-        'data':height_information,
-        'time':get_now_str()
-    }
-    variable.location_data.append(location_data)
     variable.logger_class.logger.debug("Added Print Location Information")
 
     

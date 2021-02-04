@@ -34,12 +34,13 @@ class octoprint():
         self.ip = os.getenv('OCTOPRINT_IP',"octoprint")
         self.port = os.getenv('OCTOPRINT_PORT',"5000")
         
-        self.logger.info("Finished Initalizing Octoprint Class")
         
         if(self.get_status_message() is None):
             self.logger.error("Failed to connect to octoprint. Restarting in 5 seconds")
             time.sleep(5)
             raise ValueError("Octoprint Config not valid")
+
+        self.logger.info("Finished Initalizing Octoprint Class")
 
     def __str__(self):
         return f"octoprint at {self.ip}:{self.port}"
@@ -129,34 +130,63 @@ class octoprint():
         return temp_file
         
     def get_layer_information(self):
-        layer_iformation = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
+        layer_information = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
         if(not layer_iformation):
             return None
 
-        layer_iformation = layer_iformation["layer"]
+        layer_information = layer_information["layer"]
         output_information = {
             "time": get_now_str(),
-            "current_layer": layer_iformation["current"],
-            "max_layer": layer_iformation["total"]
+            "current_layer": layer_information["current"],
+            "max_layer": layer_information["total"]
         }    
+
+        if(not output_information['current_layer'].isnumeric()):
+            output_information['current_layer'] = 0
+        if(not output_information['max_layer'].isnumeric()):
+            output_information['max_layer'] = 0
 
         return output_information
     
     def get_printer_height(self):
-        layer_iformation = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
+        height_information = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
         if(not layer_iformation):
             return None
 
-        layer_iformation = layer_iformation["height"]
+        height_information = height_information["height"]
         output_information = {
             "time": get_now_str(),
-            "current_height": layer_iformation["current"],
-            "max_height": layer_iformation["total"]
+            "current_height": height_information["current"],
+            "max_height": height_information["total"]
         }     
+
+        if(not output_information['current_height'].isnumeric()):
+            output_information['current_height'] = 0
+        if(not output_information['max_height'].isnumeric()):
+            output_information['max_height'] = 0
 
         return output_information  
 
+    def get_location_information(self):
+        location_information = {}
+
+        layer_information = self.get_layer_information()
+        if(not layer_information):
+            self.logger.error("Failed to get Octoprint Layer Information")
+            return None
+        else:
+            location_information.update(layer_information)
+            self.logger.debug("Retrived Octoprint Layer Information")
+
+        height_information = self.get_printer_height()
+        if(not height_information):
+            self.logger.error("Failed to get Octoprint Height Information")
+            return None
+        else:
+            location_information.update(height_information)
+            self.logger.debug("Retrived Octoprint Height Information")
         
+        return location_information
         
         
 

@@ -106,10 +106,10 @@ class website():
             data['print'] = print_data
 
         if(temperature_data):
-            data['temperature'] = temperature_data
+            data['temperature_data'] = temperature_data
 
         if(location_data):
-            data['location'] = location_data
+            data['location_data'] = location_data
         
         data_dict["data"] = data
         machine_dict = {

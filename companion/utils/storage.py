@@ -108,11 +108,6 @@ class influx():
     #accessors
     influx_write = None
     influx_query = None
-    
-
-    #bucket names
-    temperature_bucket = None
-    location_bucket = None
 
     #general
     variable = None
@@ -136,9 +131,6 @@ class influx():
         self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
 
-        #get bucket information
-        self.temperature_bucket = os.getenv('TEMPERATURE_BUCKET',"temperature_data")
-        self.location_bucket = os.getenv('LOCATION_BUCKET',"location_data")
         
 
     def generate_tags(self):
@@ -190,18 +182,23 @@ class disk_storage:
     #used for traversal
     loc_data = None
     
+    variable = None
+    logger = None
 
-    def __init__(self):
+    def __init__(self, variable_class):
+        self.variable = variable_class
+        self.logger = self.variable.logger_class.logger
+
         #get buffer location and size
         file_name = os.getenv("BUFFER_LOC","temp_read.hdf5")
         self.buffer_size = int(os.getenv("BUFFER_SIZE","1000"))
         
-        #get mode. Create file (w+) if it doesnt exists. Read else
-        mode = 'w+'
-        if(os.path.isfile(file_name):
-            mode = 'r+'
+        mode = 'w'
+        if(os.path.isfile(file_name)):
+            mode='r+'
 
         #open file
+        self.logger.info("opening h5py file")
         self.file = h5py.File(file_name,mode)
         
         #initialize loc_data
@@ -209,7 +206,8 @@ class disk_storage:
 
 
         #if data already exists set loc to correct location
-        if(len(list(self.file.keys)) != 0):
+        if(len(list(self.file.keys())) != 0):
+            self.logger.info("found previous datasets")
             for key in list(self.file.keys):
                 dset = self.file[key]
                 if('loc' in dset.attrs):
@@ -221,6 +219,7 @@ class disk_storage:
     def push_data(self, data_name, array, width=4):
         #if key has not been created create new dset
         if(data_name not in list(self.file.keys)):
+            self.logger.debug("creating dataset {}".format(data_name))
             dset = self.file.create_dataset(data_name, (self.buffer_size,width), maxshape=(None,width),dtype=h5py.string_dtype())
             
             dset.attrs['loc'] = 0
@@ -234,6 +233,7 @@ class disk_storage:
             dset.resize((dset.size+self.buffer_size),width)
 
         #update data in array
+        self.logger.debug("Pushing data {} to loc {} in dataset {}".format(array,loc,data_name))
         dset[loc] = array
 
         dset.attrs['loc'] = loc + 1
@@ -244,7 +244,7 @@ class disk_storage:
         output_dict = {}
 
         #for all of the datasets gather there data
-        for key in list(self.file.keys):
+        for key in list(self.file.keys()):
             output_dict[key] = self.file[key][:self.loc_data[key]]
         
         return output_dict
@@ -260,7 +260,7 @@ class disk_storage:
 
             #first shrink the dataset to the original size and then overrite any leftover data
             numpy.resize(dset, (self.buffer_size,width))
-            dset = [b'']*width
+            dset[:] = [b'']*width
 
             #reset the loc
             dset.attrs['loc'] = 0

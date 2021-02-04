@@ -17,6 +17,7 @@ class variable():
     octoprint_class = None
     s3_class = None
     influx_class = None
+    buffer_class = None
     logger_class = None
     website_class = None
     

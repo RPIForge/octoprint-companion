@@ -31,7 +31,7 @@ while(True):
         octoprint_instance = octoprint(variable_instance)
         break
     except:
-        #if unable to reach octoprint reread variables in case of key change (used in docker-compose)
+        #if unable to reach octoprint reread variables in case of key change (used in docker)
         variable_instance.read_env()
 
 variable_instance.octoprint_class = octoprint_instance
@@ -44,6 +44,10 @@ variable_instance.s3_class = s3_instance
 from utils.storage import influx
 influx_instance = influx(variable_instance)
 variable_instance.influx_class = influx_instance
+
+from utils.storage import disk_storage
+buffer_instance = disk_storage(variable_instance)
+variable_instance.buffer_class = buffer_instance
 
 #initialize website companion
 from utils.website import website
