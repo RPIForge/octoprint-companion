@@ -73,7 +73,8 @@ class s3():
         
         
 
-
+    def connected(self):
+        return self.connected
     
     def upload_file(self, file):
         if(not self.connected):
@@ -132,6 +133,8 @@ class influx():
         self.influx_query = self.influx_client.query_api()
 
         
+    def connected(self):
+        return self.influx_client.health()
 
     def generate_tags(self):
         tag_list = []
@@ -146,6 +149,11 @@ class influx():
         return tag_list
 
     def write(self, name, bucket, time, tags, fields):
+        if(not self.connected()):
+            self.logger.error("Influx not avaiable. Skipping Write")
+            return
+
+
         self.logger.debug("writting to influxdb")
         
         #create data_point

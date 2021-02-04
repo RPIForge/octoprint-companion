@@ -19,31 +19,66 @@ class generic_data():
         self.variable = variable_class
         self.logger = variable_class.logger_class
 
+    #
+    # Data Gathering - functions used that gather data from the source
+    #
     #used to pull data from octoprint/datasource 
     def update_data(self.variable):
-        pass
+        raise Exception("update_data must be implemented")
     
-    #used to parse h5py arrays to dictionaries
-    def parse_data(self, array):
-        output_dictionary = {}
+    #
+    # Data Processing - functions that manipluate data for specific functions
+    #
 
+     #used to parse  h5py arrays to generic dictionaries
+    def parse_h5py_data(self, array):
+        output_dict = {}
         for index in range(len(array)):
-            field_name = self.fields[index]
-            output_dictionary[field_name] = array[index]
+            output_dict[self.fields[index]] = array[index]
+        return output_dict
+    
+    #format generic data for influxdb
+    def format_influx_data(self,dictionary):
+        raise Exception("format_influx_data must be implemented")
 
-        return output_dictionary
+    def format_website_data(self, dictionary)
+        raise Exception("format_website_data must be implemented")
+    #
+    # Data Retrval - functions used that get data
+    #
+    def get_raw_data(self):
+        return self.variable.buffer_class.get_data(self.dataset_name)
 
-
-    #get the data from h5py    
-    def get_data(self):
-        data = self.variable.buffer_class.get_data(self.dataset_name)
+    #get the data from h5py and format it for influx   
+    def get_influx_data(self):
+        data = self.get_raw_data()
         
         output_array = []
         for measurement in data:
-            
+            #process raw dsata
+            parsed_data = self.parse_h5py_data(measurement)
 
+            #format data for influx
+            formated_measurement = self.format_influx_data(parsed_data)                    
+            output_array.append(formated_measurement)
 
         return output_array
+    
+    #get the data from h5py for website
+    def get_website_data(self):
+        data = self.get_raw_data()
+        
+        output_array = []
+        for measurement in data:
+            #process raw dsata
+            parsed_data = self.parse_h5py_data(measurement)
+
+            #format data for website
+            formated_measurement = self.format_website_data(parsed_data)
+            output_array.append(parsed_data)
+
+        return output_array
+
     
 class temperature_data(generic_data):
     dataset_name = 'temperature_data'
@@ -79,6 +114,25 @@ class temperature_data(generic_data):
 
         self.logger.debug("Added Print Location Information")
     
+    def parse_data(self,array):
+        influx_dict = {
+                'time':None,
+                'tags':{},
+                'fields':{}
+        }
+
+        influx_dict['time'] = array[0]
+
+        influx_dict['tags']['tool'] = array[1]
+
+        influx_dict['fields']['temperature'] = array[2]
+        influx_dict['fields']['temperature_data'] = array[3]
+
+        
+        
+
+
+
 class location_data(generic_data):
     name = 'location_data'
 
