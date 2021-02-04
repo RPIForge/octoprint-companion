@@ -208,17 +208,17 @@ class disk_storage:
         #if data already exists set loc to correct location
         if(len(list(self.file.keys())) != 0):
             self.logger.info("found previous datasets")
-            for key in list(self.file.keys):
+            for key in list(self.file.keys()):
                 dset = self.file[key]
                 if('loc' in dset.attrs):
-                    self.loc_data[dset.name] = dset.attrs['loc']
+                    self.loc_data[key] = dset.attrs['loc']
                 else:
-                    self.loc_data[dset.name] = 0
+                    self.loc_data[key] = 0
 
 
     def push_data(self, data_name, array, width=4):
         #if key has not been created create new dset
-        if(data_name not in list(self.file.keys)):
+        if(data_name not in list(self.file.keys())):
             self.logger.debug("creating dataset {}".format(data_name))
             dset = self.file.create_dataset(data_name, (self.buffer_size,width), maxshape=(None,width),dtype=h5py.string_dtype())
             
@@ -232,13 +232,20 @@ class disk_storage:
         if(loc >= dset.size):
             dset.resize((dset.size+self.buffer_size),width)
 
+        #validate all data is string
+        for index in range(len(array)):
+            array[index] = str(array[index])
+
         #update data in array
         self.logger.debug("Pushing data {} to loc {} in dataset {}".format(array,loc,data_name))
         dset[loc] = array
-
+        
         dset.attrs['loc'] = loc + 1
         self.loc_data[dset] = loc + 1
-    
+        
+        #flush the h5py buffer to disk
+        self.file.flush()
+
     #get all of the data from the store
     def get_data(self):
         output_dict = {}
@@ -252,7 +259,7 @@ class disk_storage:
     #clear the data from the datasets
     def clear_data(self):
         #for all datasets
-        for key in list(self.file.keys):
+        for key in list(self.file.keys()):
             #get the width of the dataset
             dset = self.file[key]
             shape = dset.shape

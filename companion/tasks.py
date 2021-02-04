@@ -47,7 +47,7 @@ def get_temperature(variable):
     #push data to the buffer
     time_str = get_now_str()
     for tool in temperature_information:
-        data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['goal']]
+        data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
         variable.buffer_class.push_data('temperature_data',data_array)
 
     variable.logger_class.logger.debug("Added Print Temperature Information")
