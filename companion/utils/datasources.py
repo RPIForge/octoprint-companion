@@ -152,7 +152,7 @@ class location_data(generic_data):
 
         #get printer location
         octoprint = self.variable.octoprint_class
-        location_information = octoprint.get_location()
+        location_information = octoprint.get_location_information()
 
         if(not location_information):
             self.logger.error("Failed to get Location Information")
@@ -175,6 +175,8 @@ class location_data(generic_data):
         name = "{} location".format(self.variable.name)
 
         time = dictionary['time']
+
+        tags = {}
 
         fields = {
                 'current_layer':dictionary['current_layer'],

@@ -36,8 +36,7 @@ class octoprint():
         
         
         if(self.get_status_message() is None):
-            self.logger.error("Failed to connect to octoprint. Restarting in 5 seconds")
-            time.sleep(5)
+            self.logger.error("Failed to connect to octoprint. Restarting octoprint")
             raise ValueError("Octoprint Config not valid")
 
         self.logger.info("Finished Initalizing Octoprint Class")
@@ -131,7 +130,7 @@ class octoprint():
         
     def get_layer_information(self):
         layer_information = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
-        if(not layer_iformation):
+        if(not layer_information):
             return None
 
         layer_information = layer_information["layer"]
@@ -141,16 +140,16 @@ class octoprint():
             "max_layer": layer_information["total"]
         }    
 
-        if(not output_information['current_layer'].isnumeric()):
+        if(output_information['current_layer'] == '-'):
             output_information['current_layer'] = 0
-        if(not output_information['max_layer'].isnumeric()):
+        if(output_information['max_layer'] == '-'):
             output_information['max_layer'] = 0
 
         return output_information
     
     def get_printer_height(self):
         height_information = self.make_get_request("/plugin/DisplayLayerProgress/values",{})
-        if(not layer_iformation):
+        if(not height_information):
             return None
 
         height_information = height_information["height"]
@@ -160,9 +159,9 @@ class octoprint():
             "max_height": height_information["total"]
         }     
 
-        if(not output_information['current_height'].isnumeric()):
+        if(output_information['current_height'] == '-'):
             output_information['current_height'] = 0
-        if(not output_information['max_height'].isnumeric()):
+        if(output_information['max_height'] == '-'):
             output_information['max_height'] = 0
 
         return output_information  

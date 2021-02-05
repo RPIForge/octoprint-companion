@@ -221,17 +221,44 @@ class disk_storage:
         file_name = os.getenv("BUFFER_LOC","temp_read.hdf5")
         self.buffer_size = int(os.getenv("BUFFER_SIZE","1000"))
         
-        mode = 'w'
-        if(os.path.isfile(file_name)):
-            mode='r+'
-
-        #open file
-        self.logger.info("opening h5py file")
-        self.file = h5py.File(file_name,mode)
-        
         #initialize loc_data
         self.loc_data = {}
 
+        
+        #open file
+        #if files exists move it to .backup and open it as readonly. Then duplicate the contents to thecorrect file
+        # This handles bad written data at the end of the previous crash. This is not a great solution but the one
+        # h5py have provided for now
+
+        self.logger.info("Handling previous data")
+        if(os.path.isfile(file_name)):
+            #move file to backup
+            new_name = file_name+'.old'
+            os.rename(file_name,new_name)
+            
+            #open old and new file
+            old_file = h5py.File(new_name,'r',swmr=True,libver='latest')
+            self.file = h5py.File(file_name,'w',swmr=True,libver='latest')
+            
+            #for old datasets
+            for key in list(old_file.keys()):
+                #get the old shape
+                old_shape = old_file[key].shape
+                old_maxshape = old_file[key].maxshape
+                
+                #create new shape
+                self.file.create_dataset(key,old_shape,maxshape=old_maxshape,dtype=h5py.string_dtype())
+                
+                #copy data
+                self.file[key] = old_file[key]
+                self.file[key].attrs = old_file[key].attrs
+
+        self.logger.info("opening h5py file in swmr mode")
+        self.file = h5py.File(file_name,mode,libver='latest')
+        
+        #initialize loc_data
+        self.loc_data = {}
+        
 
         #if data already exists set loc to correct location
         if(len(list(self.file.keys())) != 0):
