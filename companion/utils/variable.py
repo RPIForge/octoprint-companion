@@ -27,8 +27,7 @@ class variable():
     job_id = None
 
     #buffered data
-    temperature_data = []
-    location_data = []
+    datasources = []
 
     #data to be sent next print
     machine_data = {}

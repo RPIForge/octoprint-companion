@@ -93,7 +93,7 @@ class website():
 
 
     #push octo data to website       
-    def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
+    def send_data(self,machine_data=None,print_data=None,time_data=None):
         data_dict = {
             'time':get_now_str()
         }
@@ -105,11 +105,8 @@ class website():
         if(print_data):
             data['print'] = print_data
 
-        if(temperature_data):
-            data['temperature_data'] = temperature_data
-
-        if(location_data):
-            data['location_data'] = location_data
+        if(time_data):
+            data.update(time_data)
         
         data_dict["data"] = data
         machine_dict = {

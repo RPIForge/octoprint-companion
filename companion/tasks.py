@@ -89,22 +89,51 @@ def get_status(variable):
     
     variable.status = status
 
+def update_influx(variable):
+    #log start of status
+    variable.logger_class.logger.info("Pushing Data to Influx")
+
+    time_data = {}
+    all_uploaded = True
+    for source in variable.datasources:
+        if(not source.influx):
+            continue 
+
+        #get influx data
+        influx_data = source.get_influx_data()
+        if(influx_data == []):
+            variable.logger_class.logger.info("No data to upload for source {}".format(source.name))
+            continue
+
+        #send data to influx
+        response = variable.influx_class.write_points(source.name,influx_data)
+
+        #if data was succesfully uploaded clear out the dataset
+        if(response):
+            source.clear_data()
+        else:
+            all_uploaded = False
+
+    if(all_uploaded):
+        variable.logger_class.logger.info("Successfully Uploaded all Data")
+    else:
+        variable.logger_class.logger.error("Unable to upload all data")
 
 def update_website(variable):
     #log start of status
     variable.logger_class.logger.info("Updating Website Data")
 
-    response = variable.website_class.send_data(variable.machine_data,variable.print_data,variable.temperature_data,variable.location_data)
+    time_data = {}
+    for source in variable.datasources:
+        time_data[source.name] = source.get_website_data(count=10)
+    
+    response = variable.website_class.send_data(variable.machine_data, variable.print_data, time_data)
     if(not response):
         variable.logger_class.logger.error("Failed to update site with Octoprint data")
         return
     else:
          variable.logger_class.logger.info("Successfully updated site")
 
-    variable.machine_data = {}
-    variable.print_data = {}
-    variable.temperature_data = []
-    variable.location_data = []
     variable.logger_class.logger.debug("Successfully updated site")
 
     #get updated data from the website

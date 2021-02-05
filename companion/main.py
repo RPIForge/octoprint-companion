@@ -25,14 +25,8 @@ variable_instance.read_env()
 
 #initialize octoprint companion
 from utils.octoprint import octoprint
-while(True):
-    try:
-        #try to get octoprint instance
-        octoprint_instance = octoprint(variable_instance)
-        break
-    except:
-        #if unable to reach octoprint reread variables in case of key change (used in docker)
-        variable_instance.read_env()
+#try to get octoprint instance
+octoprint_instance = octoprint(variable_instance)
 
 variable_instance.octoprint_class = octoprint_instance
 
@@ -67,7 +61,7 @@ from utils.datasources import temperature_data,location_data
 #initalize all data sources
 temperature = temperature_data(variable_instance)
 location = location_data(variable_instance)
-variable_instance.datatypes = [temperature, location] #used for writing all of the data
+variable_instance.datasources = [temperature, location] #used for writing all of the data
 
 schedule.every(2.5).seconds.do(temperature.update_data)
 schedule.every(5).seconds.do(location.update_data)
