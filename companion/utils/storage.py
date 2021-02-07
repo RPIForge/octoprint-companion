@@ -237,24 +237,16 @@ class disk_storage:
             os.rename(file_name,new_name)
             
             #open old and new file
-            old_file = h5py.File(new_name,'r',swmr=True,libver='latest')
-            self.file = h5py.File(file_name,'w',swmr=True,libver='latest')
+            old_file = h5py.File(new_name,'r')
+            self.file = h5py.File(file_name,'w')
             
-            #for old datasets
+            #for old datasets copy data
             for key in list(old_file.keys()):
-                #get the old shape
-                old_shape = old_file[key].shape
-                old_maxshape = old_file[key].maxshape
-                
-                #create new shape
-                self.file.create_dataset(key,old_shape,maxshape=old_maxshape,dtype=h5py.string_dtype())
-                
-                #copy data
-                self.file[key] = old_file[key]
-                self.file[key].attrs = old_file[key].attrs
+                old_file.copy(key,self.file)
 
-        self.logger.info("opening h5py file in swmr mode")
-        self.file = h5py.File(file_name,mode,libver='latest')
+        if(not self.file):
+            self.logger.info("opening h5py file")
+            self.file = h5py.File(file_name)
         
         #initialize loc_data
         self.loc_data = {}
@@ -348,6 +340,8 @@ class disk_storage:
         #reset the loc
         dset.attrs['loc'] = 0
         self.loc_data[dset_name] = 0
+
+        self.file.flush()
 
     #clear the data from the datasets
     def clear_all_data(self):
