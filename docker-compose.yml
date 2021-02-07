@@ -28,13 +28,17 @@ services:
     image: "forge/companion:latest"
     container_name: companion
     restart: unless-stopped
+    volumes:
+      - .:/data
     depends_on:
       - octoprint
       - influx
     environment:
       - OCTOPRINT_IP=octoprint
-      - INFLUX_TOKEN=EtdHkL0cNtn8350KURoB7kFCVcJTKhj8jHoMkvoNonOOxExURSDlpzHgPY6kV5tVux69hb1qlkLV-XIhpoSz0A==
-
+      - INFLUX_TOKEN=0aGlS4tJCKMRWq_C7UP6ae9-sOTW0HhOmkHCoGe6pmcQEexz-5vgW0c0PilL-es6G0Yyx1L79cr6kTHZukcXXQ==
+      - BUFFER_LOC=/data/data.hdf5
 volumes:
     influx-data:
+      driver: local
+    companion-data:
       driver: local
