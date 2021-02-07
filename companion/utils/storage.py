@@ -230,23 +230,33 @@ class disk_storage:
         # This handles bad written data at the end of the previous crash. This is not a great solution but the one
         # h5py have provided for now
 
-        self.logger.info("Handling previous data")
+        
         if(os.path.isfile(file_name)):
+            self.logger.info("Handling previous data")
+
             #move file to backup
-            new_name = file_name+'.old'
-            os.rename(file_name,new_name)
+            old_file_name = file_name+'.old'
+            os.rename(file_name,old_file_name)
             
             #open old and new file
-            old_file = h5py.File(new_name,'r')
-            self.file = h5py.File(file_name,'w')
+            try:
+                old_file = h5py.File(old_file_name,'r',swmr=True)
+                self.file = h5py.File(file_name,'w')
             
-            #for old datasets copy data
-            for key in list(old_file.keys()):
-                old_file.copy(key,self.file)
+                #for old datasets copy data
+                for key in list(old_file.keys()):
+                    old_file.copy(key,self.file)
+                
+                #close and delete old data
+                old_file.close()
+                os.remove(old_file_name)
+            except Exception as e:
+                self.logger.error("Handling previous data failed")
+                self.logger.error(e)
 
         if(not self.file):
             self.logger.info("opening h5py file")
-            self.file = h5py.File(file_name)
+            self.file = h5py.File(file_name, 'w')
         
         #initialize loc_data
         self.loc_data = {}
