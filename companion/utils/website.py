@@ -93,15 +93,12 @@ class website():
 
 
     #push octo data to website       
-    def send_data(self,machine_data=None,print_data=None,time_data=None):
+    def send_data(self,print_data=None,time_data=None):
         data_dict = {
             'time':get_now_str()
         }
         
         data = {}
-        if(machine_data):
-            data['machine'] = machine_data
-
         if(print_data):
             data['print'] = print_data
 
