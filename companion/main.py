@@ -50,25 +50,25 @@ variable_instance.website_class = website_instance
 
 #import and schedule generic tasks
 import tasks
-schedule.every(5).seconds.do(tasks.get_status, variable_instance)
 schedule.every(5).seconds.do(tasks.get_end_time, variable_instance)
 schedule.every(5).seconds.do(tasks.update_influx, variable_instance)
 schedule.every(10).seconds.do(tasks.update_website, variable_instance)
 
 #import and schedule data source specific tasks
-from utils.datasources import temperature_data,location_data
+from utils.datasources import temperature_data,location_data, status_data
 
 #initalize all data sources
 temperature = temperature_data(variable_instance)
 location = location_data(variable_instance)
-variable_instance.datasources = [temperature, location] #used for writing all of the data
+status = status_data(variable_instance)
+variable_instance.datasources = [temperature, location, status] #used for writing all of the data
 
 schedule.every(2.5).seconds.do(temperature.update_data)
 schedule.every(5).seconds.do(location.update_data)
-
+schedule.every(5).seconds.do(status.update_data)
 
 #get status initially
-tasks.get_status(variable_instance)
+status.update_data()
 
 #run tasks
 while True:

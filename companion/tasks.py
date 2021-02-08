@@ -94,7 +94,8 @@ def update_influx(variable):
     variable.logger_class.logger.info("Pushing Data to Influx")
 
     time_data = {}
-    all_uploaded = True
+    all_uploaded = []
+    error = False
     for source in variable.datasources:
         if(not source.influx):
             continue 
@@ -102,7 +103,7 @@ def update_influx(variable):
         #get influx data
         influx_data = source.get_influx_data()
         if(influx_data == []):
-            variable.logger_class.logger.info("No data to upload for source {}".format(source.name))
+            variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
             continue
 
         #send data to influx
@@ -111,13 +112,16 @@ def update_influx(variable):
         #if data was succesfully uploaded clear out the dataset
         if(response):
             source.clear_data()
+            all_uploaded.append(source.name)
         else:
-            all_uploaded = False
+            error = True
 
-    if(all_uploaded):
-        variable.logger_class.logger.info("Successfully Uploaded all Data")
-    else:
+    if(error):
         variable.logger_class.logger.error("Unable to upload all data")
+    elif(all_uploaded == []):
+        variable.logger_class.logger.info("No data to upload")
+    else:
+        variable.logger_class.logger.info("Successfully Uploaded data to : {}".format(','.join(all_uploaded)))
 
 def update_website(variable):
     #log start of status
@@ -125,7 +129,7 @@ def update_website(variable):
 
     time_data = {}
     for source in variable.datasources:
-        time_data[source.name] = source.get_website_data(count=10)
+        time_data[source.name] = source.get_website_data(count=-10)
     
     response = variable.website_class.send_data(variable.machine_data, variable.print_data, time_data)
     if(not response):

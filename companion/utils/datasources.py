@@ -129,8 +129,8 @@ class temperature_data(generic_data):
         }
         
         fields = {
-                'actual':dictionary['actual'],
-                'target':dictionary['goal']
+                'actual':float(dictionary['actual']),
+                'target':float(dictionary['goal'])
         }
         
         point = self.variable.influx_class.generate_point(name,time,tags,fields)
@@ -179,10 +179,101 @@ class location_data(generic_data):
         tags = {}
 
         fields = {
-                'current_layer':dictionary['current_layer'],
-                'max_layer':dictionary['max_layer'],
-                'current_height':dictionary['current_height'],
-                'max_height':dictionary['max_height']
+                'current_layer':float(dictionary['current_layer']),
+                'max_layer':float(dictionary['max_layer']),
+                'current_height':float(dictionary['current_height']),
+                'max_height':float(dictionary['max_height'])
         }
 
         return self.variable.influx_class.generate_point(name,time,tags,fields)
+
+class status_data(generic_data):
+    name = 'status_data'
+
+    fields = ['time', 'status', 'status_message']
+
+    def update_data(self):
+        #log start of status
+        self.logger.debug("Getting Octoprint Status")
+
+        #get printer status
+        octoprint = self.variable.octoprint_class
+        status_text = octoprint.get_status_message()
+        status = octoprint.get_status(status_text)
+
+
+        #if error retreaving status
+        if(not status):
+            self.logger.error("Failed to get Octoprint Status")
+            return
+
+        #if new status
+        if(status != self.variable.status):
+            self.logger.debug("Status Changed")
+
+            #if new print
+            if(status == "printing" and self.variable.status!="paused"):
+                self.logger.info("Print Starting")
+                file = octoprint.get_file()
+                file_id = self.variable.s3_class.upload_file(file)
+
+                machine_dict = {
+                    'status':status,
+                    'status_message': status_text
+                }
+
+                information_dict = {
+                    'file_id':file_id
+                }
+
+                self.variable.print_data.update(information_dict)
+
+            if(status == "operational" and self.variable.status == "printing"):
+                self.logger.info("Print Finished")
+
+                machine_dict = {
+                    'status':"completed",
+                    'status_message':status_text
+                }
+
+            else:
+                self.logger.info("Printer is now {}".format(status))
+
+                machine_dict = {
+                    'status':status,
+                    'status_message':status_text
+                }
+
+            data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
+            self.variable.buffer_class.push_data(self.name,data_array,width=3)
+
+        else:
+            self.logger.debug("Status unchanged")
+
+        self.variable.status = status
+
+    def format_influx_data(self,dictionary):
+        name = "{} status".format(self.variable.name)
+
+        time = dictionary['time']
+
+        tags = {}
+
+        fields = {
+                'status':dictionary['status'],
+                'status_message':dictionary['status_message'],
+        }
+
+        return self.variable.influx_class.generate_point(name,time,tags,fields)
+    
+    #override get_website_data to only get the most recent data
+    def get_website_data(self,count=None):
+        data = self.get_raw_data(-1)
+       
+        parsed_data = None
+        if(len(data) != 0):
+            #process raw dsata
+            parsed_data = self.parse_h5py_data(data[0])
+
+        return parsed_data
+

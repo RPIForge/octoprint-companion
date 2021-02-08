@@ -163,10 +163,8 @@ class influx():
             data_point.tag(key, str(tags[key]))
         
         for key in fields:
-            try:
-                data_point.field(key, float(fields[key]))
-            except ValueError:
-                self.logger.debug("field {} is not a float. value={}".format(key,fields[key]))
+            data_point.field(key, fields[key])
+
         
         #if datapoint is empty
         if(data_point._fields == {}):
@@ -192,7 +190,7 @@ class influx():
             
         try:
             self.influx_write.write(bucket, self.influx_org, point_array)
-            self.logger.info("Successfully wrote {} datapoints to influx bucket {}".format(len(point_array),bucket))
+            self.logger.debug("Successfully wrote {} datapoints to influx bucket {}".format(len(point_array),bucket))
             return True
         except Exception as e:
             self.logger.error("Unable to write to influx bucket {}".format(bucket))
@@ -294,7 +292,7 @@ class disk_storage:
             array[index] = str(array[index])
 
         #update data in array
-        self.logger.info("Pushing data {} to loc {} in dataset {}".format(array,loc,data_name))
+        self.logger.debug("Pushing data {} to loc {} in dataset {}".format(array,loc,data_name))
         dset[loc] = array
         
         dset.attrs['loc'] = loc + 1
@@ -313,10 +311,10 @@ class disk_storage:
 
         if(count > self.loc_data[dset_name]):
             count = self.loc_data[dset_name]
-
-        if(count < 0):
-            count = 0
         
+        if(count<0):
+            count = self.loc_data[dset_name]+count
+
         return self.file[dset_name][:count]
 
     #get all of the data from the store
