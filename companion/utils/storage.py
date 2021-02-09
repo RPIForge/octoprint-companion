@@ -237,9 +237,10 @@ class disk_storage:
             
             #open old and new file
             try:
-                old_file = h5py.File(old_file_name,'r',swmr=True)
-                self.file = h5py.File(file_name,'w')
-            
+                old_file = h5py.File(old_file_name,'r',swmr=True, libver='latest')
+                self.file = h5py.File(file_name,'w', libver='latest')
+                self.file.swmr_mode = True
+
                 #for old datasets copy data
                 for key in list(old_file.keys()):
                     old_file.copy(key,self.file)
@@ -253,8 +254,10 @@ class disk_storage:
 
         if(not self.file):
             self.logger.info("opening h5py file")
-            self.file = h5py.File(file_name, 'w')
-        
+            self.file = h5py.File(file_name, 'w', libver='latest')
+            self.file.swmr_mode = True
+
+
         #initialize loc_data
         self.loc_data = {}
         
