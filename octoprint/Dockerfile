@@ -1,6 +1,5 @@
 FROM octoprint/octoprint:latest 
 
-
 ENV PIP_USER true
 ENV PYTHONUSERBASE /octoprint/plugins
 ENV PATH "${PYTHONUSERBASE}/bin:${PATH}"

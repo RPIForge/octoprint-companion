@@ -2,6 +2,8 @@ FROM python:3
 ENV PYTHONUNBUFFERED=1
 WORKDIR /companion
 
+RUN pip install --upgrade pip setuptools wheel
+
 COPY ./requirements.txt /companion/
 RUN pip install -r requirements.txt
 
