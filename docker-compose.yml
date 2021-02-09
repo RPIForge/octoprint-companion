@@ -34,7 +34,7 @@ services:
       - octoprint
       - influx
     environment:
-      - INFLUX_TOKEN=0aGlS4tJCKMRWq_C7UP6ae9-sOTW0HhOmkHCoGe6pmcQEexz-5vgW0c0PilL-es6G0Yyx1L79cr6kTHZukcXXQ==
+      - INFLUX_KEY=0aGlS4tJCKMRWq_C7UP6ae9-sOTW0HhOmkHCoGe6pmcQEexz-5vgW0c0PilL-es6G0Yyx1L79cr6kTHZukcXXQ==
       - BUFFER_LOC=/data/data.hdf5
 volumes:
     influx-data:

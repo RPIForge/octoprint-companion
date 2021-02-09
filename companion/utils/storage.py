@@ -120,7 +120,7 @@ class influx():
 
         #get env variables
         url = os.getenv('INFLUX_URL',"http://influx:8086")
-        token = os.getenv('INFLUX_TOKEN',"")
+        token = os.getenv('INFLUX_KEY',"")
         self.influx_org = os.getenv('INFLUX_ORG',"forge")
 
         
