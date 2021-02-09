@@ -27,9 +27,9 @@ class website():
         self.logger = self.variable.logger_class.logger
         self.logger.info("Initalizing Website Class")
         
-
-        self.url = os.getenv('SITE_URL',"http://localhost:8000")
-        
+        #get site url
+        url_string = os.getenv('SITE_URL',"http://localhost:8000")
+        self.url = url_string.strip()
         
         #get the api key
         self.api_key = os.getenv('SITE_KEY',"test_key")
@@ -40,7 +40,6 @@ class website():
         
     #format url    
     def get_url(self):
-
         return self.url
 
     def make_get_request(self,endpoint, dictionary):
@@ -84,23 +83,17 @@ class website():
 
 
     #push octo data to website       
-    def send_data(self,machine_data=None,print_data=None,temperature_data=None,location_data=None):
+    def send_data(self,print_data=None,time_data=None):
         data_dict = {
             'time':get_now_str()
         }
         
         data = {}
-        if(machine_data):
-            data['machine'] = machine_data
-
         if(print_data):
             data['print'] = print_data
 
-        if(temperature_data):
-            data['temperature'] = temperature_data
-
-        if(location_data):
-            data['location'] = location_data
+        if(time_data):
+            data.update(time_data)
         
         data_dict["data"] = data
         machine_dict = {

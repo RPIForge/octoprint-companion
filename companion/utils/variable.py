@@ -17,6 +17,7 @@ class variable():
     octoprint_class = None
     s3_class = None
     influx_class = None
+    buffer_class = None
     logger_class = None
     website_class = None
     
@@ -25,9 +26,10 @@ class variable():
     job = None
     job_id = None
 
-    #print data
-    temperature_data = []
-    location_data = []
+    #buffered data
+    datasources = []
+
+    #data to be sent next print
     machine_data = {}
     print_data = {}
     

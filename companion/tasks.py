@@ -27,212 +27,55 @@ def get_end_time(variable):
     variable.print_data.update(print_data)
     variable.logger_class.logger.debug("Updated Print end_time")
 
-def get_temperature(variable):
+def update_influx(variable):
     #log start of status
-    variable.logger_class.logger.debug("Getting Octoprint Temperature Information")
-    
-    if(variable.status == "offline"):
-        variable.logger_class.logger.debug("Skipping getting Octoprint Temperature Information")
-        return
+    variable.logger_class.logger.info("Pushing Data to Influx")
 
-    #get printer status
-    octoprint = variable.octoprint_class
-    temperature_information = octoprint.get_temperature()
-    if(not temperature_information):
-        variable.logger_class.logger.error("Failed to get Temperature Information")
-        return
-    else:
-        variable.logger_class.logger.debug("Retrived Octoprint Temperature Information")
-    
-    #update influx
-    tag_list = variable.influx_class.generate_tags()
-    
-    for tool in temperature_information:
-        #get names
-        measurement_name = "{}'s {} temperature".format(variable.name, tool)
-        
-        #get fields
-        field_list = []
-        field_list.append(('temperature', temperature_information[tool]["actual"]))
-        field_list.append(('temperature_goal', temperature_information[tool]["target"]))
+    time_data = {}
+    all_uploaded = []
+    error = False
+    for source in variable.datasources:
+        if(not source.influx):
+            continue 
 
-        variable.influx_class.write(measurement_name,variable.influx_class.temperature_bucket,get_now_str(),tag_list,field_list)
+        #get influx data
+        influx_data = source.get_influx_data()
+        if(influx_data == []):
+            variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
+            continue
 
+        #send data to influx
+        response = variable.influx_class.write_points(source.name,influx_data)
 
-
-    #only update site when printing
-    if(variable.status!="printing"):
-        variable.logger_class.logger.debug("Skipping setting print Temperature Information")
-        return
-
-
-    temperature_data = {
-        'data':temperature_information,
-        'time':get_now_str()
-    }
-
-    variable.temperature_data.append(temperature_data)
-    variable.logger_class.logger.debug("Added Print Temperature Information")
-
-    
-
-
-def get_location(variable):
-    #log start of status
-    variable.logger_class.logger.debug("Getting Octoprint Location Information")
-    
-    if(variable.status == "offline"):
-        variable.logger_class.logger.debug("Skipping getting Octoprint Location Information")
-        return
-
-    #get printer status
-    octoprint = variable.octoprint_class
-    layer_information = octoprint.get_layer_information()
-    
-    if(not layer_information):
-        variable.logger_class.logger.error("Failed to get Octoprint Layer Information")
-        return
-    else:
-        variable.logger_class.logger.debug("Retrived Octoprint Layer Information")
-
-    height_information = octoprint.get_printer_height()
-    
-    if(not layer_information):
-        variable.logger_class.logger.error("Failed to get Octoprint Height Information")
-        return
-    else:
-        variable.logger_class.logger.debug("Retrived Octoprint Height Information")
-    
-    height_information.update(layer_information)
-
-
-
-    #if website/influx needs to be updated
-
-
-    if(variable.status!="printing"):
-        variable.logger_class.logger.debug("Skipping updating Octoprint Location Information")
-        return
-    
-    ##sending data to influx
-    #only send location data to influx when it is printing as DisplayLayerProgress only works while printing
-
-    #generate measure_ment name
-    measurement_name = "{}'s location".format(variable.name)
-    
-
-    #generate list of tags
-    tag_list = variable.influx_class.generate_tags()
-
-    #organize fields
-    field_list = []
-    current_height = height_information["current_height"]
-    if(current_height != '-'):
-        field_list.append(('current_height',current_height))
-    
-    max_height = height_information["max_height"]
-    if(max_height != '-'):
-        field_list.append(('max_height',max_height))
-    
-    current_layer = height_information["current_layer"]
-    if(current_layer != '-'):
-        field_list.append(('current_layer',current_layer))
-    
-    max_layer = height_information["max_layer"]
-    if(max_layer != '-'):
-        field_list.append(('max_layer',max_layer))
-
-    
-    variable.influx_class.write(measurement_name,variable.influx_class.location_bucket,get_now_str(),tag_list,field_list)
-
-
-    #update website data
-    location_data = {
-        'data':height_information,
-        'time':get_now_str()
-    }
-    variable.location_data.append(location_data)
-    variable.logger_class.logger.debug("Added Print Location Information")
-
-    
-#get pritn status
-def get_status(variable):
-    #log start of status
-    variable.logger_class.logger.debug("Getting Octoprint Status")
-    
-    #get printer status
-    octoprint = variable.octoprint_class
-    status_text = octoprint.get_status_message()
-    status = octoprint.get_status(status_text)
-    
-    
-    #if error retreaving status
-    if(not status):
-        variable.logger_class.logger.error("Failed to get Octoprint Status")
-        return
-    
-
-    #if new status
-    if(status != variable.status):
-        variable.logger_class.logger.debug("Status Changed")
-        
-        #if new print
-        if(status == "printing" and variable.status!="paused"):
-            variable.logger_class.logger.info("Print Starting")
-            file = octoprint.get_file()
-            file_id = variable.s3_class.upload_file(file)
-            
-            machine_dict = {
-                'status':status,
-                'status_message': status_text
-            }
-
-            information_dict = {
-                'file_id':file_id
-            }       
-
-            if(information_dict):
-                variable.print_data.update(information_dict)     
-                         
-        if(status == "operational" and variable.status == "printing"):
-            variable.logger_class.logger.info("Print Finished")
-            
-            machine_dict = {
-                'status':"completed",
-                'status_message':status_text
-            }
-        
+        #if data was succesfully uploaded clear out the dataset
+        if(response):
+            source.clear_data()
+            all_uploaded.append(source.name)
         else:
-            variable.logger_class.logger.info("Printer is now {}".format(status))
+            error = True
 
-            machine_dict = {
-                'status':status,
-                'status_message':status_text
-            }
-        
-        variable.machine_data.update(machine_dict)
-        
+    if(error):
+        variable.logger_class.logger.error("Unable to upload all data")
+    elif(all_uploaded == []):
+        variable.logger_class.logger.info("No data to upload")
     else:
-        variable.logger_class.logger.debug("Status unchanged")
-    
-    variable.status = status
-
+        variable.logger_class.logger.info("Successfully Uploaded data to : {}".format(','.join(all_uploaded)))
 
 def update_website(variable):
     #log start of status
     variable.logger_class.logger.info("Updating Website Data")
 
-    response = variable.website_class.send_data(variable.machine_data,variable.print_data,variable.temperature_data,variable.location_data)
+    time_data = {}
+    for source in variable.datasources:
+        time_data[source.name] = source.get_website_data(count=-10)
+    
+    response = variable.website_class.send_data(variable.print_data, time_data)
     if(not response):
         variable.logger_class.logger.error("Failed to update site with Octoprint data")
         return
     else:
          variable.logger_class.logger.info("Successfully updated site")
 
-    variable.machine_data = {}
-    variable.print_data = {}
-    variable.temperature_data = []
-    variable.location_data = []
     variable.logger_class.logger.debug("Successfully updated site")
 
     #get updated data from the website
