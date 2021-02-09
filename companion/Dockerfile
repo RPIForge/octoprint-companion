@@ -2,8 +2,10 @@ FROM python:3.8
 ENV PYTHONUNBUFFERED=1
 WORKDIR /companion
 
+
+RUN uname -a
 RUN apt update
-RUN apt install -y --fix-missing make g++
+RUN apt install -y --fix-missing pkg-config
 RUN apt install -y --fix-missing libhdf5-serial-dev libhdf5-dev python3-h5py
 
 RUN pip install --upgrade pip setuptools wheel
