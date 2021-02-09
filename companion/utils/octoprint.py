@@ -18,8 +18,7 @@ from utils.utils import get_now_time, get_now_str
 
 class octoprint():
     api_key = None
-    ip = None
-    port = None
+    url = None
 
     variable = None
     logger = None
@@ -31,8 +30,7 @@ class octoprint():
         
         #init variable object
         self.api_key = os.getenv('OCTOPRINT_KEY',"test")
-        self.ip = os.getenv('OCTOPRINT_IP',"octoprint")
-        self.port = os.getenv('OCTOPRINT_PORT',"5000")
+        self.url = os.getenv('OCTOPRINT_URL',"http://octoprint:5000")
         
         
         if(self.get_status_message() is None):
@@ -45,7 +43,7 @@ class octoprint():
         return f"octoprint at {self.ip}:{self.port}"
         
     def get_url(self):
-        return "http://{}:{}".format(self.ip,self.port)
+        return self.url
     
     def make_get_request(self,endpoint, dictionary):
         try:
