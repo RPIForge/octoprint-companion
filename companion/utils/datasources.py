@@ -253,9 +253,10 @@ class status_data(generic_data):
             else:
                 self.logger.debug("Status unchanged")
 
-        except:
+        except Exception as e:
+
             self.logger.error("Failed to run update status scripts")
-            self.logger.error("Updating status")
+            self.logger.error(e)
 
         self.variable.status = status
 

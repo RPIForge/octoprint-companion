@@ -101,32 +101,30 @@ class octoprint():
         return None
     
     def get_file(self):
-        try:
-            job_information = self.make_get_request("/api/job",{})
-            if(not job_information or "state" not in job_information):
-                return None
-            
-            status = job_information['state']
-            if(status and (status!="Printing from SD" or status!="Printing")):
-                return None
-            
-            status_file_info = job_information["job"]["file"]
-            file_info = self.make_get_request("/api/files/{}/{}".format(status_file_info["origin"], status_file_info["name"]),{})
-            if(not file_info or 'refs' not in file_info or 'download' not in file_info['refs']):
-                return None
-             
-            file_data = utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
-            file_hex = hashlib.md5(file_data).hexdigest()
-            
-            temp_file = tempfile.NamedTemporaryFile()
-            temp_file.write(file_data)
-            temp_file.fileinfo = {'hash': file_hex}
-            
-            
-                
-            return temp_file
-        except:
+        job_information = self.make_get_request("/api/job",{})
+        if(not job_information or "state" not in job_information):
             return None
+        
+        status = job_information['state']
+        if(status and (status!="Printing from SD" or status!="Printing")):
+            return None
+        
+        status_file_info = job_information["job"]["file"]
+        file_info = self.make_get_request("/api/files/{}/{}".format(status_file_info["origin"], status_file_info["name"]),{})
+        if(not file_info or 'refs' not in file_info or 'download' not in file_info['refs']):
+            return None
+            
+        file_data = utils.communication.get_file(file_info["refs"]["download"], {}, {"X-Api-Key":self.api_key})
+        file_hex = hashlib.md5(file_data).hexdigest()
+        
+        temp_file = tempfile.NamedTemporaryFile()
+        temp_file.write(file_data)
+        temp_file.fileinfo = {'hash': file_hex}
+        
+        
+            
+        return temp_file
+      
 
     def get_layer_information(self):
         layer_information = self.make_get_request("/plugin/DisplayLayerProgress/values",{})

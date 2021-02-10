@@ -11,7 +11,7 @@ def get_request(url,payload=None, header=None):
     try:
         
         response = requests.get(url, params=payload, headers=header)
-        log.debug("get response from {} code: {} content: {}".format(url, response.status_code,response.content))
+        log.debug("get response from {} code: {}".format(url, response.status_code))
         
         if(response.status_code!=200):
             log.error('get failed from {} code: {}'.format(url, response.status_code))
@@ -27,7 +27,7 @@ def post_request(url,paramaters=None,header=None, data=None):
     try:
         
         response = requests.post(url, params=paramaters,  headers=header, data=data)
-        log.debug("post response from {} code: {} content: {}".format(url, response.status_code,response.content))
+        log.debug("post response from {} code: {}".format(url, response.status_code))
         
         if(response.status_code!=200):
             log.error('post failed from {} code: {}'.format(url, response.status_code))
