@@ -120,7 +120,7 @@ class temperature_data(generic_data):
 
         
     def format_influx_data(self,dictionary):
-        name = "{}'s {}".format(self.variable.name, dictionary['tool_name'])
+        name = "{}'s temperature".format(self.variable.name)
         
         time = dictionary['time']
 
@@ -206,49 +206,56 @@ class status_data(generic_data):
         if(not status):
             self.logger.error("Failed to get Octoprint Status")
             return
+        try:
+            #if new status
+            if(status != self.variable.status):
+                self.logger.debug("Status Changed")
 
-        #if new status
-        if(status != self.variable.status):
-            self.logger.debug("Status Changed")
+                #if new print
+                if(status == "printing" and self.variable.status!="paused"):
+                    self.logger.info("Print Starting")
+                    try:
+                        file = octoprint.get_file()
+                        file_id = self.variable.s3_class.upload_file(file)
+                    except:
+                        self.logger.error("failed to get/upload file")
 
-            #if new print
-            if(status == "printing" and self.variable.status!="paused"):
-                self.logger.info("Print Starting")
-                file = octoprint.get_file()
-                file_id = self.variable.s3_class.upload_file(file)
+                    machine_dict = {
+                        'status':status,
+                        'status_message': status_text
+                    }
 
-                machine_dict = {
-                    'status':status,
-                    'status_message': status_text
-                }
+                    information_dict = {
+                        'file_id':file_id
+                    }
 
-                information_dict = {
-                    'file_id':file_id
-                }
+                    self.variable.print_data.update(information_dict)
 
-                self.variable.print_data.update(information_dict)
+                if(status == "operational" and self.variable.status == "printing"):
+                    self.logger.info("Print Finished")
 
-            if(status == "operational" and self.variable.status == "printing"):
-                self.logger.info("Print Finished")
+                    machine_dict = {
+                        'status':"completed",
+                        'status_message':status_text
+                    }
 
-                machine_dict = {
-                    'status':"completed",
-                    'status_message':status_text
-                }
+                else:
+                    self.logger.info("Printer is now {}".format(status))
+
+                    machine_dict = {
+                        'status':status,
+                        'status_message':status_text
+                    }
+
+                data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
+                self.variable.buffer_class.push_data(self.name,data_array,width=3)
 
             else:
-                self.logger.info("Printer is now {}".format(status))
+                self.logger.debug("Status unchanged")
 
-                machine_dict = {
-                    'status':status,
-                    'status_message':status_text
-                }
-
-            data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
-            self.variable.buffer_class.push_data(self.name,data_array,width=3)
-
-        else:
-            self.logger.debug("Status unchanged")
+        except:
+            self.logger.error("Failed to run update status scripts")
+            self.logger.error("Updating status")
 
         self.variable.status = status
 

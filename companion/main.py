@@ -72,5 +72,8 @@ status.update_data()
 
 #run tasks
 while True:
-    schedule.run_pending()
-    time.sleep(1)
+    try:
+        schedule.run_pending()
+        time.sleep(1)
+    except:
+        logger_instance.logger.error("Failed to run scheduled jobs")

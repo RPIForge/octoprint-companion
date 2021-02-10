@@ -39,6 +39,10 @@ plugins:
         _config_version: 1
 printerProfiles:
     default: _default
+serial:
+    autoconnect: true
+    baudrate: 0
+    port: /dev/ttyACM0
 server:
     commands:
         serverRestartCommand: s6-svc -r /var/run/s6/services/octoprint

@@ -7,7 +7,7 @@ services:
     container_name: octoprint
     restart: unless-stopped
     devices:
-      - /dev/ttyAMA0:/dev/ttyAMA0
+      - /dev/ttyACM0:/dev/ttyACM0
     ports:
       - "5000:5000"
 
