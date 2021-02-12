@@ -1,0 +1,20 @@
+version: "2.1"
+   
+services:
+  octoprint:
+    build: ./octoprint/.
+    image: "forge/octoprint:latest"
+    container_name: octoprint
+    restart: unless-stopped
+    ports:
+      - "80:5000"
+  
+  companion:
+    build: ./companion/.
+    image: "forge/companion:latest"
+    container_name: companion
+    restart: unless-stopped
+    depends_on:
+      - octoprint
+    environment:
+      - BUFFER_LOC=/data/data.hdf5
