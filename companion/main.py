@@ -25,9 +25,7 @@ variable_instance.read_env()
 
 #initialize octoprint companion
 from utils.octoprint import octoprint
-#try to get octoprint instance
 octoprint_instance = octoprint(variable_instance)
-
 variable_instance.octoprint_class = octoprint_instance
 
 #initialize storage companions
@@ -48,32 +46,42 @@ from utils.website import website
 website_instance = website(variable_instance)
 variable_instance.website_class = website_instance
 
-#import and schedule generic tasks
-import tasks
-schedule.every(5).seconds.do(tasks.get_end_time, variable_instance)
-schedule.every(5).seconds.do(tasks.update_influx, variable_instance)
-schedule.every(10).seconds.do(tasks.update_website, variable_instance)
+#initalize flask endpoints
+from flask import Flask
+from utils.routes import endpoints
+variable_instance.flask_app = Flask(__name__)
+variable_instance.flask_app.register_blueprint(endpoints)
 
-#import and schedule data source specific tasks
+#Initalize scheduler
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+scheduler = BackgroundScheduler()
+variable_instance.scheduler = scheduler
+
+#scheduler generic tasks
+from utils.tasks import get_end_time, update_influx, update_website
+scheduler.add_job(func=get_end_time, trigger="interval", [variable_instance], seconds=5)
+scheduler.add_job(func=update_influx, trigger="interval", [variable_instance], seconds=5)
+scheduler.add_job(func=update_website, trigger="interval", [variable_instance], seconds=10)
+
+
+#initalize data source
 from utils.datasources import temperature_data,location_data, status_data
-
-#initalize all data sources
 temperature = temperature_data(variable_instance)
 location = location_data(variable_instance)
 status = status_data(variable_instance)
 variable_instance.datasources = [temperature, location, status] #used for writing all of the data
 
-schedule.every(2.5).seconds.do(temperature.update_data)
-schedule.every(5).seconds.do(location.update_data)
-schedule.every(5).seconds.do(status.update_data)
+#schedule data sources
+scheduler.add_job(func=temperature.update_data, trigger="interval", seconds=2.5)
+scheduler.add_job(func=location.update_data, trigger="interval", seconds=5)
+scheduler.add_job(func=status.update_data, trigger="interval", seconds=5)
 
 #get status initially
 status.update_data()
 
-#run tasks
-while True:
-    try:
-        schedule.run_pending()
-        time.sleep(1)
-    except:
-        logger_instance.logger.error("Failed to run scheduled jobs")
+#make sure scheduler stops at exit
+atexit.regiister(lambda: scheduler.shutdown())
+
+#start scheduler
+scheduler.start()
