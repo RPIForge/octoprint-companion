@@ -17,4 +17,4 @@ COPY ./wait-for-it.sh /companion/wait-for-it.sh
 RUN chmod +x /companion/wait-for-it.sh
 
 COPY . /companion/
-CMD ["/companion/wait-for-it.sh","octoprint:5000","--","flask","run","-h","0.0.0.0","-p","8000"]
+CMD ["/companion/wait-for-it.sh","octoprint:5000","--","flask","run","-h","0.0.0.0","-p","9000"]
