@@ -6,3 +6,5 @@ s3transfer==0.3.3
 schedule==0.6.0
 influxdb-client==1.13
 h5py==3.1
+Flask==1.1
+APScheduler==3.7

@@ -35,13 +35,19 @@ def update_influx(variable):
     all_uploaded = []
     error = False
     for source in variable.datasources:
+       
+
         if(not source.influx):
             continue 
+        
+        #lock db for reading and writting
+        variable.buffer_class.acquire_lock()
 
         #get influx data
         influx_data = source.get_influx_data()
         if(influx_data == []):
             variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
+            variable.buffer_class.release_lock()
             continue
 
         #send data to influx
@@ -53,6 +59,8 @@ def update_influx(variable):
             all_uploaded.append(source.name)
         else:
             error = True
+        
+        variable.buffer_class.release_lock()
 
     if(error):
         variable.logger_class.logger.error("Unable to upload all data")

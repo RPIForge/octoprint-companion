@@ -12,7 +12,10 @@ class variable():
     printer_id = None
     type = None
 
-    
+    #flask application
+    flask_app = None
+
+
     #util classes
     octoprint_class = None
     s3_class = None

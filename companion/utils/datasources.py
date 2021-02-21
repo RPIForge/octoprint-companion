@@ -3,7 +3,7 @@
 #
 
 #util import
-from .utils import get_now_str
+from .utils import get_now_str, convert_float
 
 
 #abstract data class
@@ -129,10 +129,11 @@ class temperature_data(generic_data):
         }
         
         fields = {
-                'actual':float(dictionary['actual']),
-                'target':float(dictionary['goal'])
+                'actual':convert_float(dictionary['actual']),
+                'target':convert_float(dictionary['goal'])
         }
-        
+                
+
         point = self.variable.influx_class.generate_point(name,time,tags,fields)
 
         return point
@@ -179,10 +180,10 @@ class location_data(generic_data):
         tags = {}
 
         fields = {
-                'current_layer':float(dictionary['current_layer']),
-                'max_layer':float(dictionary['max_layer']),
-                'current_height':float(dictionary['current_height']),
-                'max_height':float(dictionary['max_height'])
+                'current_layer':convert_float(dictionary['current_layer']),
+                'max_layer':convert_float(dictionary['max_layer']),
+                'current_height':convert_float(dictionary['current_height']),
+                'max_height':convert_float(dictionary['max_height'])
         }
 
         return self.variable.influx_class.generate_point(name,time,tags,fields)

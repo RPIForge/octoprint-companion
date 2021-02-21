@@ -9,3 +9,14 @@ def get_now_time():
 
 def get_now_str():
     return get_now_time().strftime("%Y-%m-%d %H:%M:%S %Z")
+
+
+
+def convert_float(number,default=0.0):
+    try:
+        output = float(number)
+    except:
+        output = default
+    
+    return output
+    
