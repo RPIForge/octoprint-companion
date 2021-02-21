@@ -5,6 +5,7 @@
 ##General Imports
 #for sys enviroment
 import os
+import threading 
 
 #random string creation
 import uuid
@@ -186,7 +187,7 @@ class influx():
             return False
 
         self.logger.debug("writting to influxdb")
-            
+         
         try:
             self.influx_write.write(bucket, self.influx_org, point_array)
             self.logger.debug("Successfully wrote {} datapoints to influx bucket {}".format(len(point_array),bucket))
@@ -206,6 +207,10 @@ class disk_storage:
 
     #used for traversal
     loc_data = None
+
+    #data lock - lock db when updating influx and when pushing data.
+    # Currently this lock is taken in push_data and in task
+    lock = threading.Lock()
     
     variable = None
     logger = None
@@ -274,6 +279,8 @@ class disk_storage:
 
 
     def push_data(self, data_name, array, width=4):
+        self.acquire_lock()
+
         #if key has not been created create new dset
         if(data_name not in list(self.file.keys())):
             self.logger.debug("creating dataset {}".format(data_name))
@@ -303,8 +310,11 @@ class disk_storage:
         #flush the h5py buffer to disk
         self.file.flush()
 
+        self.release_lock()
+
     #get data from one dset
     def get_data(self, dset_name, count=None):
+        
         if(dset_name not in list(self.file.keys())):
             return []
         
@@ -359,7 +369,13 @@ class disk_storage:
         for key in list(self.file.keys()):
             self.clear_data(key) 
     
-
+    def acquire_lock(self):
+        self.logger.debug("acquiring database lock")
+        self.lock.acquire()
+    
+    def release_lock(self):
+        self.logger.debug("releasing database lock")
+        self.lock.release()
 
 
 

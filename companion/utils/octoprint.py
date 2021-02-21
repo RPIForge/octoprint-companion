@@ -95,6 +95,7 @@ class octoprint():
         
     def get_temperature(self):
         response = self.make_get_request("/api/printer",{})
+
         if(response and "temperature" in response and "tool0" in response["temperature"]):
             return response["temperature"]
         

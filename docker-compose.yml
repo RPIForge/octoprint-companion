@@ -10,14 +10,13 @@ services:
       - "5000:5000"
 
   influx:
-    image: quay.io/influxdb/influxdb:v2.0.3
+    image: quay.io/influxdb/influxdb:v2.0.4
     command: influxd run --bolt-path /var/lib/influxdb2/influxd.bolt --engine-path /var/lib/influxdb2/engine --store bolt
     container_name: influx
     volumes:
       - influx-data:/var/lib/influxdb2
     ports:
       - "8086:8086"
-      - "2003:2003"
     environment:
       - INFLUXDB_DB=db0
       - INFLUXDB_ADMIN_USER="forge"
@@ -36,9 +35,10 @@ services:
       - octoprint
       - influx
     environment:
-      - INFLUX_KEY=0aGlS4tJCKMRWq_C7UP6ae9-sOTW0HhOmkHCoGe6pmcQEexz-5vgW0c0PilL-es6G0Yyx1L79cr6kTHZukcXXQ==
-      - BUFFER_LOC=/data/data.hdf5
+      - INFLUX_KEY=2QtFwCoHLoYzJegCqU6u-n6-vu7ZEIZTqwDMGx6ISFnouSGGyWDSFRUvEYTqbX_f-c42ob-KQQSzl3KPQWNEaQ==
+      - BUFFER_LOC=/data/dasudcta.hdf5
       - FLASK_APP=main.py
+      - LOG=INFO
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health-check"]
       interval: 30s

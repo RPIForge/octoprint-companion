@@ -61,9 +61,9 @@ variable_instance.scheduler = scheduler
 
 #scheduler generic tasks
 from utils.tasks import get_end_time, update_influx, update_website
-scheduler.add_job(func=lambda: get_end_time(variable_instance), trigger="interval", seconds=5)
-scheduler.add_job(func=lambda: update_influx(variable_instance), trigger="interval",  seconds=5)
-scheduler.add_job(func=lambda: update_website(variable_instance), trigger="interval", seconds=10)
+scheduler.add_job(func=lambda: get_end_time(variable_instance), trigger="interval", seconds=10)
+scheduler.add_job(func=lambda: update_influx(variable_instance), trigger="interval",  seconds=15)
+scheduler.add_job(func=lambda: update_website(variable_instance), trigger="interval", seconds=15)
 
 
 #initalize data source
@@ -74,7 +74,7 @@ status = status_data(variable_instance)
 variable_instance.datasources = [temperature, location, status] #used for writing all of the data
 
 #schedule data sources
-scheduler.add_job(func=temperature.update_data, trigger="interval", seconds=2.5)
+scheduler.add_job(func=temperature.update_data, trigger="interval", seconds=5)
 scheduler.add_job(func=location.update_data, trigger="interval", seconds=5)
 scheduler.add_job(func=status.update_data, trigger="interval", seconds=5)
 
