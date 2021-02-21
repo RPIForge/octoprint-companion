@@ -49,7 +49,8 @@ variable_instance.website_class = website_instance
 #initalize flask endpoints
 from flask import Flask
 from utils.routes import endpoints
-variable_instance.flask_app = Flask(__name__)
+app = Flask(__name__)
+variable_instance.flask_app = app
 variable_instance.flask_app.register_blueprint(endpoints)
 
 #Initalize scheduler
@@ -60,9 +61,9 @@ variable_instance.scheduler = scheduler
 
 #scheduler generic tasks
 from utils.tasks import get_end_time, update_influx, update_website
-scheduler.add_job(func=get_end_time, trigger="interval", [variable_instance], seconds=5)
-scheduler.add_job(func=update_influx, trigger="interval", [variable_instance], seconds=5)
-scheduler.add_job(func=update_website, trigger="interval", [variable_instance], seconds=10)
+scheduler.add_job(func=lambda: get_end_time(variable_instance), trigger="interval", seconds=5)
+scheduler.add_job(func=lambda: update_influx(variable_instance), trigger="interval",  seconds=5)
+scheduler.add_job(func=lambda: update_website(variable_instance), trigger="interval", seconds=10)
 
 
 #initalize data source
@@ -81,7 +82,7 @@ scheduler.add_job(func=status.update_data, trigger="interval", seconds=5)
 status.update_data()
 
 #make sure scheduler stops at exit
-atexit.regiister(lambda: scheduler.shutdown())
+atexit.register(lambda: scheduler.shutdown())
 
 #start scheduler
 scheduler.start()

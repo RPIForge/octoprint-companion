@@ -30,12 +30,19 @@ services:
     restart: unless-stopped
     volumes:
       - companion-data:/data
+    ports:  
+      - "8000:8000"
     depends_on:
       - octoprint
       - influx
     environment:
       - INFLUX_KEY=0aGlS4tJCKMRWq_C7UP6ae9-sOTW0HhOmkHCoGe6pmcQEexz-5vgW0c0PilL-es6G0Yyx1L79cr6kTHZukcXXQ==
       - BUFFER_LOC=/data/data.hdf5
+      - FLASK_APP=main.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health-check"]
+      interval: 30s
+      timeout: 5s
 volumes:
     influx-data:
       driver: local
