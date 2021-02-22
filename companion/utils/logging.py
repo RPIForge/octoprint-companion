@@ -7,7 +7,26 @@
 import os
 import time
 #Import logging classes
+import sys
 import logging
+
+
+class StreamToLogger(object):
+    """
+    Fake file-like stream object that redirects writes to a logger instance.
+    """
+    def __init__(self, logger, level):
+       self.logger = logger
+       self.level = level
+       self.linebuf = ''
+
+    def write(self, buf):
+       for line in buf.rstrip().splitlines():
+          self.logger.log(self.level, line.rstrip())
+
+    def flush(self):
+        pass
+
 
 
 class logger():
@@ -47,9 +66,15 @@ class logger():
         console_handler.setLevel(level)
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('{"time":"%(asctime)s","logger_name":"%(name)s", "thread":"%(threadName)s","path":"%(pathname)s","line":"%(lineno)d","level":"%(levelname)s", "message":"%(message)s"}')
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
+        file_formatter = logging.Formatter('{"time":"%(asctime)s","logger_name":"%(name)s", "thread":"%(threadName)s","path":"%(pathname)s","line":"%(lineno)d","level":"%(levelname)s", "message":"%(message)s"}')
+        file_handler.setFormatter(file_formatter)
+        
+        console_formatter = logging.Formatter('%(asctime)s %(threadName)s [%(pathname)s:%(lineno)d] %(message)s')
+        console_handler.setFormatter(console_formatter)
+        
+        #attach stdout and stderr to logger
+        sys.stdout = StreamToLogger(self.logger,logging.INFO)
+        sys.stderr = StreamToLogger(self.logger,logging.ERROR)
 
         #adder handlers to logger
         self.logger.addHandler(file_handler)

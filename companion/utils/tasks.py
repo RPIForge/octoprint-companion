@@ -47,7 +47,7 @@ def update_influx(variable):
         influx_data = source.get_influx_data()
         if(influx_data == []):
             variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
-            variable.buffer_class.release_lock()
+            variable.buffer_class.release_lock("update_influx")
             continue
 
         #send data to influx
