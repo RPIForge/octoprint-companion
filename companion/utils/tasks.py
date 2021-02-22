@@ -41,7 +41,7 @@ def update_influx(variable):
             continue 
         
         #lock db for reading and writting
-        variable.buffer_class.acquire_lock()
+        variable.buffer_class.acquire_lock("update_influx")
 
         #get influx data
         influx_data = source.get_influx_data()
@@ -60,7 +60,7 @@ def update_influx(variable):
         else:
             error = True
         
-        variable.buffer_class.release_lock()
+        variable.buffer_class.release_lock("update_influx")
 
     if(error):
         variable.logger_class.logger.error("Unable to upload all data")

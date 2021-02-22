@@ -211,7 +211,8 @@ class disk_storage:
     #data lock - lock db when updating influx and when pushing data.
     # Currently this lock is taken in push_data and in task
     lock = threading.Lock()
-    
+    lock_name = ''
+
     variable = None
     logger = None
 
@@ -279,7 +280,7 @@ class disk_storage:
 
 
     def push_data(self, data_name, array, width=4):
-        self.acquire_lock()
+        self.acquire_lock(data_name)
 
         #if key has not been created create new dset
         if(data_name not in list(self.file.keys())):
@@ -310,7 +311,7 @@ class disk_storage:
         #flush the h5py buffer to disk
         self.file.flush()
 
-        self.release_lock()
+        self.release_lock(data_name)
 
     #get data from one dset
     def get_data(self, dset_name, count=None):
@@ -369,12 +370,13 @@ class disk_storage:
         for key in list(self.file.keys()):
             self.clear_data(key) 
     
-    def acquire_lock(self):
-        self.logger.debug("acquiring database lock")
+    def acquire_lock(self, name):
+        self.logger.debug("{} acquiring database lock".format(name))
         self.lock.acquire()
+        self.logger.debug("{} database lock acquired".format(name))
     
-    def release_lock(self):
-        self.logger.debug("releasing database lock")
+    def release_lock(self, name):
+        self.logger.debug("{} releasing database lock".format(name))
         self.lock.release()
 
 
