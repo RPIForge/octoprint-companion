@@ -24,6 +24,16 @@ class generic_data():
     # Data Gathering - functions used that gather data from the source
     #
     #used to pull data from octoprint/datasource 
+    def run_job(self):
+        try:
+            self.update_data()
+        except Exception as e:
+            log.error("Failed to run job {}".format(self.name))
+            log.error(e)
+			
+            if(self.variable.buffer_class.lock_name == self.name):
+                self.variable.buffer_class.release_lock(self.name)
+				
     def update_data(self):
         raise Exception("update_data must be implemented")
     
@@ -114,7 +124,7 @@ class temperature_data(generic_data):
         time_str = get_now_str()
         for tool in temperature_information:
             data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
-            self.variable.buffer_class.push_data('temperature_data',data_array)
+            self.variable.buffer_class.push_data(self.name,data_array)
 
         
         self.logger.debug("Added Print Temperature Information")
@@ -168,7 +178,7 @@ class location_data(generic_data):
         max_layer = location_information["max_layer"]
 
         data_array = [get_now_str(),current_layer,max_layer,current_height,max_height]
-        self.variable.buffer_class.push_data('location_data',data_array,width=5)
+        self.variable.buffer_class.push_data(self.name,data_array,width=5)
 
         self.logger.debug("Added Print Location Information")
 
