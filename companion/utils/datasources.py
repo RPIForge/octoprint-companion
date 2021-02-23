@@ -28,8 +28,8 @@ class generic_data():
         try:
             self.update_data()
         except Exception as e:
-            log.error("Failed to run job {}".format(self.name))
-            log.error(e)
+            self.logger.error("Failed to run job {}".format(self.name))
+            self.logger.error(e)
 			
             if(self.variable.buffer_class.lock_name == self.name):
                 self.variable.buffer_class.release_lock(self.name)
@@ -154,7 +154,7 @@ class location_data(generic_data):
     fields = ['time', 'current_layer', 'max_layer', 'current_height', 'max_height']
     
     def update_data(self):
-        #log start of status
+	#log start of status
         self.logger.debug("Getting Octoprint Location Information")
 
         if(self.variable.status != "printing"):
@@ -179,7 +179,6 @@ class location_data(generic_data):
 
         data_array = [get_now_str(),current_layer,max_layer,current_height,max_height]
         self.variable.buffer_class.push_data(self.name,data_array,width=5)
-
         self.logger.debug("Added Print Location Information")
 
     def format_influx_data(self,dictionary):

@@ -35,8 +35,8 @@ services:
       - octoprint
       - influx
     environment:
-      - INFLUX_KEY=2QtFwCoHLoYzJegCqU6u-n6-vu7ZEIZTqwDMGx6ISFnouSGGyWDSFRUvEYTqbX_f-c42ob-KQQSzl3KPQWNEaQ==
-      - BUFFER_LOC=/data/dasudcta.hdf5
+      - INFLUX_KEY=cNgmrvd3bDUQow6t2agcit7xRnNpYyjPYtGa0JM81ju8pS62lWweGUMI1fIckjGi6zyI9FC026bDGQN1sZsm8Q==
+      - BUFFER_LOC=/data/dataset.hdf5
       - FLASK_APP=main.py
       - LOG=INFO
     healthcheck:
