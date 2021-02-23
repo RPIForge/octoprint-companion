@@ -373,10 +373,12 @@ class disk_storage:
     def acquire_lock(self, name):
         self.logger.debug("{} acquiring database lock".format(name))
         self.lock.acquire()
+        self.lock_name = name
         self.logger.debug("{} database lock acquired".format(name))
     
     def release_lock(self, name):
         self.logger.debug("{} releasing database lock".format(name))
+        self.lock_name = ''
         self.lock.release()
 
 
