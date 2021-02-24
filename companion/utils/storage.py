@@ -17,7 +17,7 @@ import boto3
 ##Influx Imports
 #Influx Writers
 from influxdb_client import InfluxDBClient, Point
-from influxdb_client.client.write_api import SYNCHRONOUS
+from influxdb_client.client.write_api import ASYNCHRONOUS
 
 ##Disk Imports
 #h5py
@@ -129,7 +129,7 @@ class influx():
         #connect to influx
         self.logger.info("Connecting to InfluxDB")
         self.influx_client = InfluxDBClient(url=url, token=token)
-        self.influx_write = self.influx_client.write_api(write_options=SYNCHRONOUS)
+        self.influx_write = self.influx_client.write_api(write_options=ASYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
 
         

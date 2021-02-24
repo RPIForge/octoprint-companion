@@ -68,7 +68,9 @@ def update_influx(variable):
             outcome = func_timeout(30,update_influx_dataset, args=(variable,source))
         except FunctionTimedOut:
             outcome = False
-        
+            if(variable.buffer_class.lock_name != ''):
+                variable.logger_class.logger.error("{} has db lock".format(variable.buffer_class.lock_name))
+ 
         except Exception as e:
             variable.logger_class.logger.error("Failed to update influxdb {}".format(source.name))
             variable.logger_class.logger.error(e)
@@ -76,8 +78,8 @@ def update_influx(variable):
             if(variable.buffer_class.lock_name != ''):
                 variable.logger_class.logger.error("{} has db lock".format(variable.buffer_class.lock_name))
         
-        if(variable.buffer_class.lock_name == source.name):
-            variable.buffer_class.release_lock(source.name)            
+        if(variable.buffer_class.lock_name == 'update_influx'):
+            variable.buffer_class.release_lock('update_influx')            
             
         if(outcome is None):
             continue
