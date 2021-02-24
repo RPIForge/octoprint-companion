@@ -5,7 +5,6 @@ services:
     build: ./octoprint/.
     image: "forge/octoprint:latest"
     container_name: octoprint
-    restart: never
     devices:
       - '/dev/ttyACM0:/dev/ttyACM0'
     ports:

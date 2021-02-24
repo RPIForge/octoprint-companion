@@ -4,6 +4,7 @@
 
 
 from utils.utils import get_now_str
+from func_timeout import func_timeout, FunctionTimedOut
 
 def get_end_time(variable):
     #log start of status
@@ -27,6 +28,30 @@ def get_end_time(variable):
     variable.print_data.update(print_data)
     variable.logger_class.logger.debug("Updated Print end_time")
 
+def update_influx_dataset(variable, source):
+    #lock db for reading and writting
+    variable.buffer_class.acquire_lock("update_influx")
+
+    #get influx data
+    influx_data = source.get_influx_data()
+    if(influx_data == []):
+        variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
+        variable.buffer_class.release_lock("update_influx")
+        return None
+
+    #send data to influx
+    response = variable.influx_class.write_points(source.name,influx_data)
+
+    #if data was succesfully uploaded clear out the dataset
+    if(response):
+        source.clear_data()
+        success = True
+    else:
+        success = False
+
+    variable.buffer_class.release_lock("update_influx")
+    return success
+
 def update_influx(variable):
     #log start of status
     variable.logger_class.logger.info("Pushing Data to Influx")
@@ -39,28 +64,27 @@ def update_influx(variable):
 
         if(not source.influx):
             continue 
+        try:
+            outcome = func_timeout(30,update_influx_dataset, args=(variable,source))
+        except FunctionTimedOut:
+            outcome = False
         
-        #lock db for reading and writting
-        variable.buffer_class.acquire_lock("update_influx")
+        except Exception as e:
+            variable.logger_class.logger.error("Failed to update influxdb {}".format(source.name))
+            variable.logger_class.logger.error(e)
 
-        #get influx data
-        influx_data = source.get_influx_data()
-        if(influx_data == []):
-            variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
-            variable.buffer_class.release_lock("update_influx")
+            if(variable.buffer_class.lock_name != ''):
+                variable.logger_class.logger.error("{} has db lock".format(variable.buffer_class.lock_name))
+        
+        if(variable.buffer_class.lock_name == source.name):
+            variable.buffer_class.release_lock(source.name)            
+            
+        if(outcome is None):
             continue
-
-        #send data to influx
-        response = variable.influx_class.write_points(source.name,influx_data)
-
-        #if data was succesfully uploaded clear out the dataset
-        if(response):
-            source.clear_data()
+        elif(outcome):
             all_uploaded.append(source.name)
         else:
             error = True
-        
-        variable.buffer_class.release_lock("update_influx")
 
     if(error):
         variable.logger_class.logger.error("Unable to upload all data")

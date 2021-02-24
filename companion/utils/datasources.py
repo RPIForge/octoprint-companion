@@ -31,10 +31,14 @@ class generic_data():
             func_timeout(5,self.update_data)
         except FunctionTimedOut:
             self.logger.error("Failed to run job {} in alloated time".format(self.name))
+            if(self.variable.buffer_class.lock_name != ''):
+                self.logger.error("{} has db lock".format(self.variable.buffer_class.lock_name))
         except Exception as e:
             self.logger.error("Failed to run job {}".format(self.name))
             self.logger.error(e)
-			
+            if(self.variable.buffer_class.lock_name != ''):
+                self.logger.error("{} has db lock".format(self.variable.buffer_class.lock_name))			
+       
         if(self.variable.buffer_class.lock_name == self.name):
             self.variable.buffer_class.release_lock(self.name)
 				

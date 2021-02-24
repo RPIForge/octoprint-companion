@@ -61,9 +61,9 @@ variable_instance.scheduler = scheduler
 
 #scheduler generic tasks
 from utils.tasks import get_end_time, update_influx, update_website
-scheduler.add_job(func=lambda: get_end_time(variable_instance), trigger="interval", seconds=10)
-scheduler.add_job(func=lambda: update_influx(variable_instance), trigger="interval",  seconds=15)
-scheduler.add_job(func=lambda: update_website(variable_instance), trigger="interval", seconds=15)
+scheduler.add_job(func=lambda: get_end_time(variable_instance), name="get end job",trigger="interval", seconds=10)
+scheduler.add_job(func=lambda: update_influx(variable_instance), name="update influxdb job",trigger="interval",  seconds=15)
+scheduler.add_job(func=lambda: update_website(variable_instance), name="update website job", trigger="interval", seconds=15)
 
 
 #initalize data source
