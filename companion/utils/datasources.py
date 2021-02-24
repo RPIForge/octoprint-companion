@@ -28,7 +28,7 @@ class generic_data():
     #used to pull data from octoprint/datasource 
     def run_job(self):
         try:
-            func_timeout(5,self.update_data)
+            func_timeout(10,self.update_data)
         except FunctionTimedOut:
             self.logger.error("Failed to run job {} in alloated time".format(self.name))
             if(self.variable.buffer_class.lock_name != ''):
