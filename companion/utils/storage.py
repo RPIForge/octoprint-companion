@@ -132,9 +132,6 @@ class influx():
         self.influx_write = self.influx_client.write_api(write_options=ASYNCHRONOUS)
         self.influx_query = self.influx_client.query_api()
 
-        
-    def connected(self):
-        return self.influx_client.health()
 
     def generate_tags(self):
         tag_list = {}
@@ -181,10 +178,6 @@ class influx():
             self.logger.debug("no data to write to influx")
             return True
         
-        
-        if(not self.connected()):
-            self.logger.error("Influx not avaiable. Skipping Write")
-            return False
 
         self.logger.debug("writting to influxdb")
          
@@ -345,6 +338,7 @@ class disk_storage:
     
     #clear data for individual dset
     def clear_data(self,dset_name):
+        self.logger.debug('clearing data from {}'.format(dset_name))
         if(dset_name not in list(self.file.keys())):
             return 
         
@@ -352,20 +346,19 @@ class disk_storage:
         dset = self.file[dset_name]
         shape = dset.shape
         depth = shape[0]
-        width = shape[1]
        
         #reshrink buffer if its grown
         if(depth != self.buffer_size):
+            self.logger.debug('resize buffer')
             numpy.resize(dset, (self.buffer_size,width))
-        
-        #clear data
-        dset[:] = [b'']*width
     
         #reset the loc
         dset.attrs['loc'] = 0
         self.loc_data[dset_name] = 0
 
         self.file.flush()
+        
+        self.logger.debug('successfully cleared data from {}'.format(dset_name))
 
     #clear the data from the datasets
     def clear_all_data(self):

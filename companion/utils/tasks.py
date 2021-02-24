@@ -33,6 +33,7 @@ def update_influx_dataset(variable, source):
     variable.buffer_class.acquire_lock("update_influx")
 
     #get influx data
+    variable.logger_class.logger.debug("gathering data from {}".format(source.name))
     influx_data = source.get_influx_data()
     if(influx_data == []):
         variable.logger_class.logger.debug("No data to upload for source {}".format(source.name))
@@ -40,6 +41,7 @@ def update_influx_dataset(variable, source):
         return None
 
     #send data to influx
+    variable.logger_class.logger.debug("pushing data to influx for source {}".format(source.name))
     response = variable.influx_class.write_points(source.name,influx_data)
 
     #if data was succesfully uploaded clear out the dataset
