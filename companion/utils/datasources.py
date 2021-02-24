@@ -5,6 +5,8 @@
 #util import
 from .utils import get_now_str
 
+#timeout support
+from func_timeout import func_timeout, FunctionTimedOut
 
 #abstract data class
 class generic_data():
@@ -26,13 +28,15 @@ class generic_data():
     #used to pull data from octoprint/datasource 
     def run_job(self):
         try:
-            self.update_data()
+            func_timeout(5,self.update_data)
+        except FunctionTimedOut:
+            self.logger.error("Failed to run job {} in alloated time".format(self.name))
         except Exception as e:
             self.logger.error("Failed to run job {}".format(self.name))
             self.logger.error(e)
 			
-            if(self.variable.buffer_class.lock_name == self.name):
-                self.variable.buffer_class.release_lock(self.name)
+        if(self.variable.buffer_class.lock_name == self.name):
+            self.variable.buffer_class.release_lock(self.name)
 				
     def update_data(self):
         raise Exception("update_data must be implemented")

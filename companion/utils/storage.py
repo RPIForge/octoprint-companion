@@ -291,12 +291,14 @@ class disk_storage:
             self.loc_data[data_name] = 0
         else:
             dset = self.file[data_name]
-
+        
+        self.logger.debug("Getting location for {}".format(data_name))
         #if loc is bigger than available then resize dset
         loc = self.loc_data[data_name]
         if(loc >= dset.size):
             dset.resize((dset.size+self.buffer_size),width)
 
+        self.logger.debug("Validating data for {}".format(data_name))
         #validate all data is string
         for index in range(len(array)):
             array[index] = str(array[index])
@@ -308,6 +310,7 @@ class disk_storage:
         dset.attrs['loc'] = loc + 1
         self.loc_data[data_name] = loc + 1
          
+        self.logger.debug("Flushing data {} for disk".format(data_name))
         #flush the h5py buffer to disk
         self.file.flush()
 

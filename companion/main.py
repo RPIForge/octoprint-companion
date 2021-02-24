@@ -74,9 +74,9 @@ status = status_data(variable_instance)
 variable_instance.datasources = [temperature, location, status] #used for writing all of the data
 
 #schedule data sources
-scheduler.add_job(func=temperature.run_job, trigger="interval", seconds=2.5)
-scheduler.add_job(func=location.run_job, trigger="interval", seconds=5)
-scheduler.add_job(func=status.run_job, trigger="interval", seconds=5)
+scheduler.add_job(func=temperature.run_job, name="temperature job",trigger="interval", seconds=2.5)
+scheduler.add_job(func=location.run_job, name="location job",trigger="interval", seconds=5)
+scheduler.add_job(func=status.run_job, name="status job", trigger="interval", seconds=5)
 
 #get status initially
 status.update_data()

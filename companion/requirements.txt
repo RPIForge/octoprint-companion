@@ -8,3 +8,4 @@ influxdb-client==1.13
 h5py==3.1
 Flask==1.1
 APScheduler==3.7
+func-timeout==4.3.5
