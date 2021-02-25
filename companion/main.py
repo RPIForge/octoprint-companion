@@ -69,13 +69,11 @@ scheduler.add_job(func=lambda: update_website(variable_instance), name="update w
 #initalize data source
 from utils.datasources import temperature_data,location_data, status_data
 temperature = temperature_data(variable_instance)
-location = location_data(variable_instance)
 status = status_data(variable_instance)
-variable_instance.datasources = [temperature, location, status] #used for writing all of the data
+variable_instance.datasources = [temperature, status] #used for writing all of the data
 
 #schedule data sources
 scheduler.add_job(func=temperature.run_job, name="temperature job",trigger="interval", seconds=2.5)
-scheduler.add_job(func=location.run_job, name="location job",trigger="interval", seconds=5)
 scheduler.add_job(func=status.run_job, name="status job", trigger="interval", seconds=5)
 
 #get status initially

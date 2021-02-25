@@ -157,6 +157,10 @@ class temperature_data(generic_data):
         return point
 
 class location_data(generic_data):
+    #
+    # not in use as it requieres uploading to octoprint which voids powerloss recovery
+    #
+
     name = 'location_data'
 
     fields = ['time', 'current_layer', 'max_layer', 'current_height', 'max_height']
