@@ -131,6 +131,11 @@ class temperature_data(generic_data):
         #push data to the buffer
         time_str = get_now_str()
         for tool in temperature_information:
+            #push to mtconnect
+            self.variable.mtconnect.push_data('{}-temp'.format(tool),temperature_information[tool]['actual'])
+            self.variable.mtconnect.push_data('{}-target'.format(tool),temperature_information[tool]['target'])
+
+            #push to influx buffer
             data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
             self.variable.buffer_class.push_data(self.name,data_array)
 

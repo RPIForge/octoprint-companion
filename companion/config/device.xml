@@ -1,0 +1,19 @@
+<Devices>
+<Device id="1" name="generic-test">
+<Description>Prusa i3 mk3s</Description>
+<DataItems>
+<DataItem category="EVENT" id="avail" name="avail" type="AVAILABILITY"/>
+<DataItem category="EVENT" id="status" name="status" type="FUNCTIONAL_MODE"/>
+</DataItems>
+<Components>
+<Sensor id="temp-sensor" name="Temperature Sensor">
+<DataItems>
+<DataItem type="TEMPERATURE" id='tool0-temp' category="SAMPLE" name='Tool0 Temperature' units="CELSIUS"/>
+<DataItem type="TEMPERATURE" id='tool0-target' category="SAMPLE" name='Tool0 Temperature Target' units="CELSIUS"/>
+<DataItem type="TEMPERATURE" id='bed-temp' category="SAMPLE" name='Bed Temperature' units="CELSIUS"/>
+<DataItem type="TEMPERATURE" id='bed-target' category="SAMPLE" name="Bed Temperature Target" units="CELSIUS"/>
+</DataItems>
+</Sensor>
+</Components>
+</Device>
+</Devices>

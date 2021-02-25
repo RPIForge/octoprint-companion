@@ -15,6 +15,8 @@ class variable():
     #flask application
     flask_app = None
 
+    #mtconnect
+    mtconnect = None
 
     #util classes
     octoprint_class = None
