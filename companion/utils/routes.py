@@ -1,4 +1,5 @@
-from flask import Blueprint
+from flask import Blueprint, Response
+from utils.variable import variable_instance
 import json
 
 endpoints = Blueprint("generic_ep",__name__)
@@ -7,3 +8,7 @@ endpoints = Blueprint("generic_ep",__name__)
 def health_check():
     return {'health':'pass'}
 
+
+@endpoints.route('/probe')
+def probe():
+    return Response(variable_instance.mtconnect.probe(), mimetype='text/xml')

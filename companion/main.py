@@ -12,8 +12,7 @@ import os
 
 
 #inisitalize variable
-from utils.variable import variable
-variable_instance = variable()
+from utils.variable import variable_instance
 
 #initialize logging
 from utils.logging import logger
