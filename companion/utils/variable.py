@@ -4,7 +4,6 @@
 
 import os
 import logging
-import uuid
 
 #Class for syncing variables
 class variable():
@@ -39,12 +38,11 @@ class variable():
     machine_data = {}
     print_data = {}
     
-    id = None
     def __init__(self):
         self.name = os.getenv('NAME',"generic-test")
         self.type = os.getenv('NAME',"printer")
         self.printer_id = os.getenv('ID',"1")
-        self.id=uuid.uuid4()
+        
     def read_env(self):
         #get logger and file name
         if(self.logger_class is None):
@@ -73,5 +71,5 @@ class variable():
             log.info("setting key: {} value: {}".format(key,value))
             os.environ[key] = value.strip()
         return
-
+        
 variable_instance = variable()
