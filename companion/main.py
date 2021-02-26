@@ -2,15 +2,6 @@
 # Main File. This file initializes all classes and then starts running tasks
 #
 
-
-#schedule import
-import schedule
-import time
-
-#enviroment variables import
-import os
-
-
 #inisitalize variable
 from utils.variable import variable_instance
 

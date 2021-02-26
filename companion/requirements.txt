@@ -1,12 +1,10 @@
 mtconnect
 
-
 boto3==1.15.2
 python-dateutil==2.8.1
 pytz==2020.1
 requests==2.24.0
 s3transfer==0.3.3
-schedule==0.6.0
 influxdb-client==1.13
 h5py==3.1
 Flask==1.1

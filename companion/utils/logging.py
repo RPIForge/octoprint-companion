@@ -40,7 +40,7 @@ class logger():
         if(not os.path.isdir("logs")):
             os.mkdir("logs")
 
-        self.logger = logging.getLogger()
+        self.logger = logging.getLogger(__name__)
         
         level_var = os.getenv('LOG',"INFO")
         if(level_var == "DEBUG"):
@@ -76,9 +76,10 @@ class logger():
         sys.stdout = StreamToLogger(self.logger,logging.INFO)
         sys.stderr = StreamToLogger(self.logger,logging.ERROR)
 
-        #adder handlers to logger
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(console_handler)
+        #add handlers to all loggers
+        logging.getLogger().addHandler(file_handler)
+        logging.getLogger().addHandler(console_handler)
+
 
         self.logger.info("___________.__             ____________________.___  ___________")
         self.logger.info("\__    ___/|  |__   ____   \______   \______   \   | \_   _____/__________  ____   ____")
