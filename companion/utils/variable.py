@@ -40,7 +40,7 @@ class variable():
     
     def __init__(self):
         self.name = os.getenv('NAME',"generic-test")
-        self.type = os.getenv('NAME',"printer")
+        self.type = os.getenv('TYPE',"printer")
         self.printer_id = os.getenv('ID',"1")
         
     def read_env(self):
