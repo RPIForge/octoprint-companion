@@ -131,6 +131,11 @@ class temperature_data(generic_data):
         #push data to the buffer
         time_str = get_now_str()
         for tool in temperature_information:
+            #push to mtconnect
+            self.variable.mtconnect.push_data('{}-temp'.format(tool),temperature_information[tool]['actual'])
+            self.variable.mtconnect.push_data('{}-target'.format(tool),temperature_information[tool]['target'])
+
+            #push to influx buffer
             data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
             self.variable.buffer_class.push_data(self.name,data_array)
 
@@ -160,6 +165,7 @@ class location_data(generic_data):
     #
     # not in use as it requieres uploading to octoprint which voids powerloss recovery
     #
+
 
     name = 'location_data'
 
@@ -268,6 +274,13 @@ class status_data(generic_data):
                     'status':status,
                     'status_message':status_text
                 }
+
+            if(status == "offline"):
+                self.variable.mtconnect.push_data("avail", "UNAVAILABLE")
+                self.variable.mtconnect.push_data("status","SETUP")
+            else:
+                self.variable.mtconnect.push_data("avail", "AVAILABLE")
+                self.variable.mtconnect.push_data("status","PRODUCTION")
 
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)

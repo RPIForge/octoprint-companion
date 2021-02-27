@@ -40,7 +40,7 @@ class logger():
         if(not os.path.isdir("logs")):
             os.mkdir("logs")
 
-        self.logger = logging.getLogger('general_logger')
+        self.logger = logging.getLogger(__name__)
         
         level_var = os.getenv('LOG',"INFO")
         if(level_var == "DEBUG"):
@@ -69,16 +69,17 @@ class logger():
         file_formatter = logging.Formatter('{"time":"%(asctime)s","logger_name":"%(name)s", "thread":"%(threadName)s","path":"%(pathname)s","line":"%(lineno)d","level":"%(levelname)s", "message":"%(message)s"}')
         file_handler.setFormatter(file_formatter)
         
-        console_formatter = logging.Formatter('%(asctime)s %(threadName)s [%(pathname)s:%(lineno)d] %(message)s')
+        console_formatter = logging.Formatter('%(asctime)s %(threadName)s %(levelname)s [%(pathname)s:%(lineno)d] %(message)s')
         console_handler.setFormatter(console_formatter)
         
         #attach stdout and stderr to logger
         sys.stdout = StreamToLogger(self.logger,logging.INFO)
         sys.stderr = StreamToLogger(self.logger,logging.ERROR)
 
-        #adder handlers to logger
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(console_handler)
+        #add handlers to all loggers
+        logging.getLogger().addHandler(file_handler)
+        logging.getLogger().addHandler(console_handler)
+
 
         self.logger.info("___________.__             ____________________.___  ___________")
         self.logger.info("\__    ___/|  |__   ____   \______   \______   \   | \_   _____/__________  ____   ____")

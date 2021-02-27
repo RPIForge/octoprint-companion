@@ -2,18 +2,8 @@
 # Main File. This file initializes all classes and then starts running tasks
 #
 
-
-#schedule import
-import schedule
-import time
-
-#enviroment variables import
-import os
-
-
 #inisitalize variable
-from utils.variable import variable
-variable_instance = variable()
+from utils.variable import variable_instance
 
 #initialize logging
 from utils.logging import logger
@@ -45,6 +35,10 @@ variable_instance.buffer_class = buffer_instance
 from utils.website import website
 website_instance = website(variable_instance)
 variable_instance.website_class = website_instance
+
+#initiazlize mtconnect
+from mtconnect import MTConnect
+variable_instance.mtconnect = MTConnect(loc='config/device.xml')
 
 #initalize flask endpoints
 from flask import Flask
