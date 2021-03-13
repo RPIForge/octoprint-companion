@@ -8,7 +8,7 @@ services:
     devices:
       - '/dev/ttyACM0:/dev/ttyACM0'
     ports:
-      - "80:5000"
+      - "5000:5000"
   
   companion:
     build: ./companion/.
@@ -18,7 +18,7 @@ services:
     volumes:
       - companion-data:/data
     ports:  
-      - "9000:9000"
+      - "80:9000"
     depends_on:
       - octoprint
     environment:
@@ -28,6 +28,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health-check"]
       interval: 30s
       timeout: 5s
+
 volumes:
     companion-data:
       driver: local

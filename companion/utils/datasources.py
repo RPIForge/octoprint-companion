@@ -273,8 +273,17 @@ class status_data(generic_data):
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)
 
+            #update mtconnect
+            if(status == 'offline'):
+                self.variable.mtconnect.push_data('avail',"UNAVAILABLE")
+                self.variable.mtconnect.push_data('status',"MAINTENANCE")
+            else:
+                self.variable.mtconnect.push_data('avail',"AVAILABLE")
+                self.variable.mtconnect.push_data('status',"PRODUCTION")
+
         else:
             self.logger.debug("Status unchanged")
+        
         
         self.variable.status = status
 
