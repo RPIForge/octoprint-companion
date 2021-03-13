@@ -162,6 +162,11 @@ class temperature_data(generic_data):
         return point
 
 class location_data(generic_data):
+    #
+    # not in use as it requieres uploading to octoprint which voids powerloss recovery
+    #
+
+
     name = 'location_data'
 
     fields = ['time', 'current_layer', 'max_layer', 'current_height', 'max_height']
@@ -269,6 +274,13 @@ class status_data(generic_data):
                     'status':status,
                     'status_message':status_text
                 }
+
+            if(status == "offline"):
+                self.variable.mtconnect.push_data("avail", "UNAVAILABLE")
+                self.variable.mtconnect.push_data("status","SETUP")
+            else:
+                self.variable.mtconnect.push_data("avail", "AVAILABLE")
+                self.variable.mtconnect.push_data("status","PRODUCTION")
 
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)

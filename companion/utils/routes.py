@@ -9,6 +9,7 @@ def health_check():
     return {'health':'pass'}
 
 
+
 @endpoints.route('/probe')
 def probe():
     return Response(variable_instance.mtconnect.probe(), mimetype='text/xml')
@@ -59,3 +60,4 @@ def sample(identifier):
     return response
 
 
+>>>>>>> mtconnect

@@ -22,7 +22,7 @@ services:
     depends_on:
       - octoprint
     environment:
-      - BUFFER_LOC=/data/dasudcta.hdf5
+      - BUFFER_LOC=/data/datastore.hdf5
       - FLASK_APP=main.py
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health-check"]
