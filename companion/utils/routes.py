@@ -60,4 +60,3 @@ def sample(identifier):
     return response
 
 
->>>>>>> mtconnect
