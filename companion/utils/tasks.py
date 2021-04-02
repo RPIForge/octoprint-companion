@@ -6,6 +6,8 @@
 from utils.utils import get_now_str
 from func_timeout import func_timeout, FunctionTimedOut
 
+from datetime import datetime
+
 def get_end_time(variable):
     #log start of status
     variable.logger_class.logger.debug("Getting Octoprint end time")
@@ -96,6 +98,8 @@ def update_influx(variable):
         variable.logger_class.logger.info("No data to upload")
     else:
         variable.logger_class.logger.info("Successfully Uploaded data to : {}".format(','.join(all_uploaded)))
+    
+    variable.last_update = datetime.now()
 
 def update_website(variable):
     #log start of status

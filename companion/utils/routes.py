@@ -1,11 +1,16 @@
 from flask import Blueprint, Response, request
 from utils.variable import variable_instance
 import json
+from datetime import datetime
 
 endpoints = Blueprint("generic_ep",__name__)
 
 @endpoints.route('/health-check')
 def health_check():
+    differnce = datetime.now() - variable_instance.last_update
+    if(differnce.total_seconds()>120):
+        return Response({'health':'error'}, status=500)
+
     return {'health':'pass'}
 
 

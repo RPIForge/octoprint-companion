@@ -3,6 +3,7 @@
 #
 
 import os
+from datetime import datetime
 import logging
 
 #Class for syncing variables
@@ -38,11 +39,16 @@ class variable():
     machine_data = {}
     print_data = {}
     
+    #last time influx was updated
+    last_update = None
+
     def __init__(self):
         self.name = os.getenv('NAME',"generic-test")
         self.type = os.getenv('TYPE',"printer")
         self.printer_id = os.getenv('ID',"1")
         
+        self.last_update = datetime.now()
+
     def read_env(self):
         #get logger and file name
         if(self.logger_class is None):
