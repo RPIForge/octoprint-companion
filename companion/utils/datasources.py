@@ -154,10 +154,16 @@ class temperature_data(generic_data):
     
         if(self.variable.job):
             tags['job'] = self.variable.job
+        else:
+            tags['job'] = '-'
 
         if(self.variable.material):
             tags['material'] = self.variable.material
+        else:
+            tags['material'] = '-'
         
+        print(tags)
+
         fields = {
                 'actual':float(dictionary['actual']),
                 'target':float(dictionary['goal'])
