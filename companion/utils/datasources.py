@@ -151,6 +151,12 @@ class temperature_data(generic_data):
         tags = {
                 'tool': dictionary['tool_name']
         }
+    
+        if(self.variable.job):
+            tags['job'] = self.variable.job
+
+        if(self.variable.material):
+            tags['material'] = self.variable.material
         
         fields = {
                 'actual':float(dictionary['actual']),

@@ -139,10 +139,6 @@ class influx():
         tag_list['machine_type'] = self.variable.type
         tag_list['machine_id'] = self.variable.printer_id
 
-        if(self.variable.job is not None and self.variable.job_id is not None):
-            tag_list['job'] = self.variable.job
-            tag_list['job_id'] = self.variable.job_id
-        
         return tag_list
 
     def generate_point(self, name, time, tags, fields):

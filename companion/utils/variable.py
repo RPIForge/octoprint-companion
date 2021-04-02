@@ -12,7 +12,7 @@ class variable():
     name = None
     printer_id = None
     type = None
-
+    
     #flask application
     flask_app = None
 
@@ -30,7 +30,7 @@ class variable():
     #print status
     status = "Offline"
     job = None
-    job_id = None
+    material = None
 
     #buffered data
     datasources = []

@@ -75,6 +75,17 @@ class website():
         if(machine_info):
             self.variable.name = machine_info["name"]
             self.variable.type = machine_info["type"]
+            
+            if('job_id' in machine_info):
+                self.variable.job = machine_info['job_id']
+            else:
+                self.variable.job = None
+
+            if('material' in machine_info and self.variable.job):
+                self.variable.material = machine_info['material']
+            else:
+                self.variable.material = None
+            
             self.logger.info("Gathered Data from site")
             return True
         else:
