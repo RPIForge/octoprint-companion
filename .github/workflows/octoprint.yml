@@ -31,5 +31,5 @@ jobs:
                 docker buildx build \
                 --platform=linux/amd64,linux/arm/v7 \
                 --output "type=image,push=true" \
-                --file ./octoprint/Dockerfile ./companion \
+                --file ./octoprint/Dockerfile ./octoprint \
                 --tag rpiforge/octoprint
