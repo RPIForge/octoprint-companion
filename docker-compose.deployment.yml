@@ -3,16 +3,13 @@ version: "2.1"
 services:
   octoprint:
     build: ./octoprint/.
-    image: "forge/octoprint:latest"
+    image: "rpiforge/octoprint:latest"
     container_name: octoprint
     devices:
       - '/dev/ttyACM0:/dev/ttyACM0'
-    ports:
-      - "5000:5000"
-  
+
   companion:
-    build: ./companion/.
-    image: "forge/companion:latest"
+    image: "rpiforge/companion:latest"
     container_name: companion
     restart: unless-stopped
     volumes:
