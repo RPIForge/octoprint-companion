@@ -2,7 +2,6 @@ version: "2.1"
    
 services:
   octoprint:
-    build: ./octoprint/.
     image: "rpiforge/octoprint:latest"
     container_name: octoprint
     devices:
