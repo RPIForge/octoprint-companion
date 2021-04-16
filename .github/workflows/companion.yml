@@ -32,7 +32,7 @@ jobs:
         - name: Build companion dockerfile (with push)
           run: |
                 docker buildx build \
-                --platform=linux/arm/v7 \
+                --platform=linux/arm/v7,linux/amd64 \
                 --output "type=image,push=true" \
                 --file ./companion/Dockerfile ./companion \
                 --tag rpiforge/companion
