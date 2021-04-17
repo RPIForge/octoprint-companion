@@ -105,6 +105,7 @@ def update_website(variable):
     #log start of status
     variable.logger_class.logger.info("Updating Website Data")
 
+    
     time_data = {}
     for source in variable.datasources:
         time_data[source.name] = source.get_website_data(count=-10)
@@ -112,11 +113,8 @@ def update_website(variable):
     response = variable.website_class.send_data(variable.print_data, time_data)
     if(not response):
         variable.logger_class.logger.error("Failed to update site with Octoprint data")
-        return
     else:
          variable.logger_class.logger.info("Successfully updated site")
-
-    variable.logger_class.logger.debug("Successfully updated site")
 
     #get updated data from the website
     variable.website_class.update_info()

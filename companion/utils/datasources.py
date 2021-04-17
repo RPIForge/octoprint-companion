@@ -162,8 +162,6 @@ class temperature_data(generic_data):
         else:
             tags['material'] = '-'
         
-        print(tags)
-
         fields = {
                 'actual':float(dictionary['actual']),
                 'target':float(dictionary['goal'])
