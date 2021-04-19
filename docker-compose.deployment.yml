@@ -2,15 +2,18 @@ version: "2.1"
    
 services:
   octoprint:
+    privileged: true
     image: "rpiforge/octoprint:latest"
     container_name: octoprint
-    volumes:
-      - /dev:/dev
     devices:
       - '/dev/ttyACM0:/dev/ttyACM0'
+    networks:
+      - internal-network
 
   companion:
     network_mode: host
+    networks:
+      - internal-network
     image: "rpiforge/companion:latest"
     container_name: companion
     restart: unless-stopped
