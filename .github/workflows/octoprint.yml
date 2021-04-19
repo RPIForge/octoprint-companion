@@ -37,4 +37,4 @@ jobs:
                 --output "type=image,push=true" \
                 --file ./octoprint/Dockerfile ./octoprint \
                 --tag rpiforge/octoprint
-                --tag rpiforge/octoprint:${{GITHUB_SHA}}
+                --tag rpiforge/octoprint:${{github.sha}}

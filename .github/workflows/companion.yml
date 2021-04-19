@@ -36,4 +36,4 @@ jobs:
                 --output "type=image,push=true" \
                 --file ./companion/Dockerfile ./companion \
                 --tag rpiforge/companion \
-                --tag rpiforge/companion:${{GITHUB_SHA}}
+                --tag rpiforge/companion:${{github.sha}}
