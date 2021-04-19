@@ -1,4 +1,4 @@
-name: 'CI for Companion Release [amd64/arm7]'
+name: 'CI for Octoprint Release [amd64/arm7]'
 
 on:
     push:
@@ -33,7 +33,7 @@ jobs:
               restore-keys: |
                   ${{ runner.os }}-buildx-octoprint-
 
-        - name: Build and push companion
+        - name: Build and push octoprint
           uses: docker/build-push-action@v2
           with:
               context: ./octoprint
