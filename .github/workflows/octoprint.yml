@@ -36,5 +36,5 @@ jobs:
                 --platform=linux/arm/v7 \
                 --output "type=image,push=true" \
                 --file ./octoprint/Dockerfile ./octoprint \
-                --tag rpiforge/octoprint
+                --tag rpiforge/octoprint \
                 --tag rpiforge/octoprint:${{github.sha}}
