@@ -2,30 +2,26 @@ version: "2.1"
    
 services:
   octoprint:
-    privileged: true
+    network_mode: host
     image: "rpiforge/octoprint:latest"
     container_name: octoprint
+    restart: unless-stopped
     devices:
       - '/dev/ttyACM0:/dev/ttyACM0'
-    networks:
-      - internal-network
 
   companion:
     network_mode: host
-    networks:
-      - internal-network
     image: "rpiforge/companion:latest"
     container_name: companion
     restart: unless-stopped
     volumes:
       - companion-data:/data
-    ports:  
-      - "80:80"
     depends_on:
       - octoprint
     environment:
       - BUFFER_LOC=/data/datastore.hdf5
       - FLASK_APP=main.py
+      - OCTOPRINT_URL=http://localhost:5000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health-check"]
       interval: 30s
