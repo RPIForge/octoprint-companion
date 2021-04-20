@@ -37,6 +37,7 @@ jobs:
           uses: docker/build-push-action@v2
           with:
               context: ./octoprint
+              push: true
               platforms: linux/arm/v7
               tags: rpiforge/octoprint, rpiforge/octoprint:${{github.sha}}
               cache-from: type=local,src=/tmp/.buildx-cache

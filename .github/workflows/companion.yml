@@ -37,6 +37,7 @@ jobs:
           uses: docker/build-push-action@v2
           with:
               context: ./companion
+              push: true
               platforms: linux/arm/v7
               tags: rpiforge/companion, rpiforge/companion:${{github.sha}}
               cache-from: type=local,src=/tmp/.buildx-cache
