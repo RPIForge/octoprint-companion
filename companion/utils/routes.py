@@ -8,7 +8,7 @@ endpoints = Blueprint("generic_ep",__name__)
 @endpoints.route('/health-check')
 def health_check():
     differnce = datetime.now() - variable_instance.last_update
-    if(differnce.total_seconds()>120):
+    if(differnce.total_seconds()>60):
         return Response({'health':'error'}, status=500)
 
     return {'health':'pass'}
