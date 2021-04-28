@@ -2,12 +2,12 @@ version: "2.1"
    
 services:
   octoprint:
-    network_mode: host
     image: "rpiforge/octoprint:latest"
     container_name: octoprint
-    restart: unless-stopped
-    devices:
-      - '/dev/ttyACM0:/dev/ttyACM0'
+    restart: never
+    ports:
+      - "5000:80"
+    privilged: true
 
   companion:
     network_mode: host
