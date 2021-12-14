@@ -41,7 +41,7 @@ printerProfiles:
     default: _default
 serial:
     autoconnect: true
-    baudrate: 0
+    baudrate: 115200
     port: /dev/ttyACM0
 server:
     commands:
