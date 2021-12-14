@@ -2,14 +2,18 @@ version: "2.1"
    
 services:
   octoprint:
+    platform: linux/arm/v7
     image: "rpiforge/octoprint:latest"
     container_name: octoprint
     restart: never
     ports:
       - "5000:80"
     privileged: true
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"
 
   companion:
+    platform: linux/arm/v7
     network_mode: host
     image: "rpiforge/companion:latest"
     container_name: companion
