@@ -85,6 +85,14 @@ class website():
                 self.variable.material = machine_info['material']
             else:
                 self.variable.material = None
+
+            #update mtconnect instance
+            if(self.variable.mtconnect):
+                mtconnect_device = self.variable.mtconnect.get_device()
+                self.variable.mtconnect.set_device_name(mtconnect_device, self.variable.name)
+                self.variable.mtconnect.set_device_id(mtconnect_device, self.variable.printer_id)
+
+
             
             self.logger.info("Gathered Data from site")
             return True
