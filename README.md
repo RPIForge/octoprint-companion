@@ -17,3 +17,12 @@ Then use the following command to get the container id. The container name shoul
 
 Then take that container id and run the following command to get the octoprint API key that is stored in the container.
 
+## Organization
+
+This data collection system is split into two sections the companion and octoprint
+
+### Octoprint
+The octoprint container is based off of the [octoprint/octoprint](https://hub.docker.com/r/octoprint/octoprint) image with a custom config and users.
+
+### Companion
+The companion is a python application that will routinly call the octoprint api to get information and then upload that data to influxdb and the forge website. 
