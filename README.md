@@ -17,12 +17,16 @@ Then use the following command to get the container id. The container name shoul
 
 Then take that container id and run the following command to get the octoprint API key that is stored in the container.
 
-## Organization
+## Architecture
 
+## This Repo
 This data collection system is split into two sections the companion and octoprint
 
 ### Octoprint
 The octoprint container is based off of the [octoprint/octoprint](https://hub.docker.com/r/octoprint/octoprint) image with a custom config and users.
 
 ### Companion
-The companion is a python application that will routinly call the octoprint api to get information and then upload that data to influxdb and the forge website. 
+The companion is a python application that will routinly call the octoprint api to get information and then upload that data to influxdb and the forge website. It also makes this data aviable via MTConnect endpoints for open access. 
+
+## Dependencies
+This system depends on influxdb to store all of the historic time series data. This system can also interact with the [rpiforge website](https://github.com/RPIForge/website) to get its current information.
