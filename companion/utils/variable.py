@@ -19,6 +19,10 @@ class variable():
     #mtconnect
     mtconnect = None
 
+    #opcua
+    opcua = None
+    opcua_ref= None
+
     #util classes
     octoprint_class = None
     s3_class = None
