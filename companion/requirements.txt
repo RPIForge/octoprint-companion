@@ -1,8 +1,8 @@
 
-#mtconnect
+mtconnect
 
 
-#boto3==1.15.2
+boto3==1.15.2
 botocore==1.18.18
 
 python-dateutil==2.8.1
@@ -18,11 +18,11 @@ numpy==1.22.3
 urllib3==1.25.11
 
 
-
+cryptography==3.4.8
 
 #flask version updates
 jinja2==3.0.3
-itsdangerous==2.1.1
+itsdangerous==2.0.1
 MarkupSafe==2.1.1
 Werkzeug==2.0.3
 certifi==2021.10.8

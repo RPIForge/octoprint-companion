@@ -138,7 +138,7 @@ class temperature_data(generic_data):
             self.variable.mtconnect.push_data('{}-target'.format(tool),temperature_information[tool]['target'])
 
             #push to opcua
-            if("{}-temp".format(tool) in self.variable.opcua_ref):
+            if(self.variable.opcua_ref is not None and "{}-temp".format(tool) in self.variable.opcua_ref):
                 self.logger.debug("Updating OPCUA for tool {}".format(tool))
                 asyncio.run(self.variable.opcua_ref['{}-temp'.format(tool)].set_value(temperature_information[tool]['actual']))
                 asyncio.run(self.variable.opcua_ref['{}-target'.format(tool)].set_value(temperature_information[tool]['target']))
@@ -294,23 +294,25 @@ class status_data(generic_data):
                     'status_message':status_text
                 }
 
-            if(status == "offline"):
-                self.variable.mtconnect.push_data("avail", "UNAVAILABLE")
-                self.variable.mtconnect.push_data("status","SETUP")
-            else:
-                self.variable.mtconnect.push_data("avail", "AVAILABLE")
-                self.variable.mtconnect.push_data("status","PRODUCTION")
 
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)
 
-            #update mtconnect
             if(status == 'offline'):
+                #update mtconnect
                 self.variable.mtconnect.push_data('avail',"UNAVAILABLE")
                 self.variable.mtconnect.push_data('status',"MAINTENANCE")
+
+                if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
+                    asyncio.run(self.variable.opcua_ref["status"].set_value("offline"))
+
             else:
                 self.variable.mtconnect.push_data('avail',"AVAILABLE")
                 self.variable.mtconnect.push_data('status',"PRODUCTION")
+
+                if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
+                    asyncio.run(self.variable.opcua_ref["status"].set_value(status))
+
 
         else:
             self.logger.debug("Status unchanged")

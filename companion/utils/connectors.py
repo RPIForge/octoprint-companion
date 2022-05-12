@@ -32,7 +32,7 @@ async def opcua_server(variable_instance):
     device_type = await server.nodes.base_object_type.add_object_type(idx, "PrusaPrinter")
 
     await (await device_type.add_property(idx, "device_id", str(variable_instance.printer_id))).set_modelling_rule(True)
-    await (await device_type.add_property(idx, "status", "na", ua.VariantType.String)).set_modelling_rule(True)
+    await (await device_type.add_variable(idx, "status", "na", ua.VariantType.String)).set_modelling_rule(True)
 
     tool_obj = await device_type.add_object(idx, "ToolTemperature")
     await tool_obj.set_modelling_rule(True)
