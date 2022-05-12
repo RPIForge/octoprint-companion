@@ -7,6 +7,7 @@ RUN uname -a
 RUN apt update
 RUN apt install -y --fix-missing pkg-config
 RUN apt install -y --fix-missing libhdf5-serial-dev libhdf5-dev python3-h5py
+RUN apt install -y --fix-missing build-essential libssl-dev libffi-dev  cargo
 
 RUN pip install --upgrade pip setuptools wheel
 
