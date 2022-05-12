@@ -257,7 +257,7 @@ class status_data(generic_data):
         #if new status
         if(status != self.variable.status):
             self.logger.debug("Status Changed")
-
+    
             #if new print
             if(status == "printing" and self.variable.status!="paused"):
                 self.logger.info("Print Starting")
@@ -298,26 +298,26 @@ class status_data(generic_data):
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)
 
+            self.logger.debug("Logging MTConnect Status")
+
             if(status == 'offline'):
+
                 #update mtconnect
                 self.variable.mtconnect.push_data('avail',"UNAVAILABLE")
                 self.variable.mtconnect.push_data('status',"MAINTENANCE")
-
-                if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
-                    asyncio.run(self.variable.opcua_ref["status"].set_value("offline"))
 
             else:
                 self.variable.mtconnect.push_data('avail',"AVAILABLE")
                 self.variable.mtconnect.push_data('status',"PRODUCTION")
 
-                if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
-                    asyncio.run(self.variable.opcua_ref["status"].set_value(status))
-
-
         else:
             self.logger.debug("Status unchanged")
         
-        
+        if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
+            if(self.variable.opcua_ref["status"].get_value() != status):
+                self.logger.debug("Logging OPCUA Status")
+                asyncio.run(self.variable.opcua_ref["status"].set_value(status))
+                
         self.variable.status = status
 
     def format_influx_data(self,dictionary):
