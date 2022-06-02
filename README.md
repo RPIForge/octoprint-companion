@@ -22,6 +22,8 @@ In testing the application the following endpoints are useful in monitoring data
 | OCP UA    | localhost:4840       |                                  |
 | InfluxDB  | localhost:8086       |                                  |
 
+It is also useful to use the (Octoprint Virtual Printer)[https://docs.octoprint.org/en/master/development/virtual_printer.html] to test without having to hook up to a machine.
+
 ## Architecture
 
 ## This Repo
