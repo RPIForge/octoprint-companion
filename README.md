@@ -3,19 +3,24 @@ This is the repo to store the code for the octoprint script. This script is inte
 
 ## Install
 
-This repo has been set up using docker-compose. To build the docker image first run 
+This repo has been set up using docker-compose. To build the docker images first run 
 
 `docker-compose build`
 
-Then start up just the octoprint instance by running 
+Then start up an instance of octoprint, influx, and the python agent by running the following docker command
 
-`docker-compose run -d octoprint`
+`docker-compose up -d`
 
-Then use the following command to get the container id. The container name should be something similar to `octoprint-companion_octoprint`
+### Testing
 
-`docker ps`
+In testing the application the following endpoints are useful in monitoring data.
 
-Then take that container id and run the following command to get the octoprint API key that is stored in the container.
+| Name      | Endpoint             | Notes                            |
+|-----------|----------------------|----------------------------------|
+| MTConnect | localhost:80/current |                                  |
+| Octoprint | localhost:5000       | default account is: pi, rpiforge |
+| OCP UA    | localhost:4840       |                                  |
+| InfluxDB  | localhost:8086       |                                  |
 
 ## Architecture
 
