@@ -41,6 +41,7 @@ services:
       - ID=1
       - FLASK_APP=main.py
       - LOG=INFO
+      - OCTOPRINT_URL=http://octoprint:5000
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health-check"]
       interval: 30s

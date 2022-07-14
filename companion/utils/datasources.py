@@ -97,7 +97,12 @@ class generic_data():
             output_array.append(parsed_data)
 
         return output_array
-   
+    
+    #! DO NOT IMPLEMENT HERE
+    #! Override this function in the specific classes bellow
+    def get_graphql_data(self, count=None):
+        raise Exception("format_influx_data must be implemented")
+
     #
     # Data Deletion - functions used to delete data
     #
@@ -171,6 +176,14 @@ class temperature_data(generic_data):
 
         return point
 
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
+
+
 class location_data(generic_data):
     #
     # not in use as it requieres uploading to octoprint which voids powerloss recovery
@@ -224,6 +237,13 @@ class location_data(generic_data):
         }
 
         return self.variable.influx_class.generate_point(name,time,tags,fields)
+
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
 
 class status_data(generic_data):
     name = 'status_data'
@@ -333,4 +353,11 @@ class status_data(generic_data):
             parsed_data = self.parse_h5py_data(data[0])
 
         return parsed_data
+
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
 
