@@ -4,10 +4,10 @@
 
 #util import
 from .utils import get_now_str
-
+import pandas as pd
+from datetime import datetime
 #timeout support
 from func_timeout import func_timeout, FunctionTimedOut
-import asyncio
 
 #abstract data class
 class generic_data():
@@ -98,7 +98,12 @@ class generic_data():
             output_array.append(parsed_data)
 
         return output_array
-   
+    
+    #! DO NOT IMPLEMENT HERE
+    #! Override this function in the specific classes bellow
+    def get_graphql_data(self, count=None):
+        raise Exception("get_graphql_data must be implemented")
+
     #
     # Data Deletion - functions used to delete data
     #
@@ -123,6 +128,13 @@ class temperature_data(generic_data):
         #get printer temperature
         octoprint = self.variable.octoprint_class
         temperature_information = octoprint.get_temperature()
+        """json:
+            "tool"{
+                "actual":214.88,
+                "target":220.0,
+                "offset":0
+            }
+        """
         if(not temperature_information):
             self.logger.error("Failed to get Temperature Information")
             return
@@ -133,18 +145,10 @@ class temperature_data(generic_data):
         time_str = get_now_str()
         for tool in temperature_information:
             #push to mtconnect
-            self.logger.debug("Updating MTConnect for tool {}".format(tool))
             self.variable.mtconnect.push_data('{}-temp'.format(tool),temperature_information[tool]['actual'])
             self.variable.mtconnect.push_data('{}-target'.format(tool),temperature_information[tool]['target'])
 
-            #push to opcua
-            if(self.variable.opcua_ref is not None and "{}-temp".format(tool) in self.variable.opcua_ref):
-                self.logger.debug("Updating OPCUA for tool {}".format(tool))
-                asyncio.run(self.variable.opcua_ref['{}-temp'.format(tool)].set_value(temperature_information[tool]['actual']))
-                asyncio.run(self.variable.opcua_ref['{}-target'.format(tool)].set_value(temperature_information[tool]['target']))
-
             #push to influx buffer
-            self.logger.debug("Adding tool {} to influx buffer".format(tool))
             data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
             self.variable.buffer_class.push_data(self.name,data_array)
 
@@ -179,6 +183,50 @@ class temperature_data(generic_data):
         point = self.variable.influx_class.generate_point(name,time,tags,fields)
 
         return point
+
+    def get_graphql_data(self, count=None):
+        
+        data = self.get_raw_data(count)
+        
+        output_array = pd.DataFrame()
+        for measurement in data:
+            #process raw dsata
+            parsed_data = self.parse_h5py_data(measurement)
+
+            # self.logger.info("******** The parse data is {} ".format(str(parsed_data)))
+            # self.logger.info("******** The parse data type is {} ".format(type(parsed_data)))
+            # parsed data type is dict
+            # {'time': '2022-07-25 21:17:50 UTC', 'tool_name': 'tool0', 'actual': '21.3', 'goal': '0.0'}
+            #format data for influx
+            if (parsed_data["tool_name"]).find("tool")==-1:
+                continue
+            else:
+                formated_measurement = self.format_graphql_data(parsed_data)   
+                self.logger.info("******** The parse data is {} ".format(str(parsed_data)))
+                output_array=pd.concat([output_array, formated_measurement])
+            if(formated_measurement is None):
+                continue
+        return output_array
+
+    def format_graphql_data(self,parsed_data):
+        """format raw temperature data and format it into pandas dataframe
+
+        Args:
+            parsed_data (dict): parsed temperateure data {'time': '2022-07-25 21:17:50 UTC', 'tool_name': 'tool0', 'actual': '21.3', 'goal': '0.0'}
+
+        Returns:
+            formated_data (pandas df): formatted temperateure data in pandas format {'timestamp': '2022-07-25 21:17:50 UTC',  'actual': '21.3', 'goal': '0.0'}
+        """
+        self.logger.info("******** The time stamp data is ...")
+        timestamp=datetime.fromisoformat((parsed_data["time"]).replace(' UTC',''))
+        
+        timestamp=timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
+        d={'timestamp':[timestamp],'actual': [parsed_data["actual"]], 'goal': [parsed_data["goal"]]}
+        df = pd.DataFrame(data=d)
+        self.logger.info("******** The single temperature data is ...")
+        self.logger.info(df.to_string)
+        return df
+
 
 class location_data(generic_data):
     #
@@ -234,6 +282,13 @@ class location_data(generic_data):
 
         return self.variable.influx_class.generate_point(name,time,tags,fields)
 
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
+
 class status_data(generic_data):
     name = 'status_data'
 
@@ -257,7 +312,7 @@ class status_data(generic_data):
         #if new status
         if(status != self.variable.status):
             self.logger.debug("Status Changed")
-    
+
             #if new print
             if(status == "printing" and self.variable.status!="paused"):
                 self.logger.info("Print Starting")
@@ -294,18 +349,20 @@ class status_data(generic_data):
                     'status_message':status_text
                 }
 
+            if(status == "offline"):
+                self.variable.mtconnect.push_data("avail", "UNAVAILABLE")
+                self.variable.mtconnect.push_data("status","SETUP")
+            else:
+                self.variable.mtconnect.push_data("avail", "AVAILABLE")
+                self.variable.mtconnect.push_data("status","PRODUCTION")
 
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)
 
-            self.logger.debug("Logging MTConnect Status")
-
+            #update mtconnect
             if(status == 'offline'):
-
-                #update mtconnect
                 self.variable.mtconnect.push_data('avail',"UNAVAILABLE")
                 self.variable.mtconnect.push_data('status',"MAINTENANCE")
-
             else:
                 self.variable.mtconnect.push_data('avail',"AVAILABLE")
                 self.variable.mtconnect.push_data('status',"PRODUCTION")
@@ -313,11 +370,7 @@ class status_data(generic_data):
         else:
             self.logger.debug("Status unchanged")
         
-        if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
-            if(self.variable.opcua_ref["status"].get_value() != status):
-                self.logger.debug("Logging OPCUA Status")
-                asyncio.run(self.variable.opcua_ref["status"].set_value(status))
-                
+        
         self.variable.status = status
 
     def format_influx_data(self,dictionary):
@@ -344,4 +397,11 @@ class status_data(generic_data):
             parsed_data = self.parse_h5py_data(data[0])
 
         return parsed_data
+
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
 
