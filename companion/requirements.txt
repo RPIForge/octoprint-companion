@@ -15,7 +15,7 @@ Flask==1.1
 APScheduler==3.7
 func-timeout==4.3.5
 numpy==1.22.3
-urllib3==1.25.11
+urllib3==1.26.5
 
 
 cryptography==3.4.8
