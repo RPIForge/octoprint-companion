@@ -37,8 +37,11 @@ website_instance = website(variable_instance)
 variable_instance.website_class = website_instance
 
 #initiazlize mtconnect
-from mtconnect import MTConnect
-variable_instance.mtconnect = MTConnect(loc='config/device.xml')
+from utils.connectors import mtconnect_adapter
+variable_instance.mtconnect = mtconnect_adapter(variable_instance)
+
+from utils.connectors import start_opcua_adapter
+start_opcua_adapter(variable_instance)
 
 #initalize flask endpoints
 from flask import Flask

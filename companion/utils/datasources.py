@@ -7,6 +7,7 @@ from .utils import get_now_str
 
 #timeout support
 from func_timeout import func_timeout, FunctionTimedOut
+import asyncio
 
 #abstract data class
 class generic_data():
@@ -132,10 +133,18 @@ class temperature_data(generic_data):
         time_str = get_now_str()
         for tool in temperature_information:
             #push to mtconnect
+            self.logger.debug("Updating MTConnect for tool {}".format(tool))
             self.variable.mtconnect.push_data('{}-temp'.format(tool),temperature_information[tool]['actual'])
             self.variable.mtconnect.push_data('{}-target'.format(tool),temperature_information[tool]['target'])
 
+            #push to opcua
+            if(self.variable.opcua_ref is not None and "{}-temp".format(tool) in self.variable.opcua_ref):
+                self.logger.debug("Updating OPCUA for tool {}".format(tool))
+                asyncio.run(self.variable.opcua_ref['{}-temp'.format(tool)].set_value(temperature_information[tool]['actual']))
+                asyncio.run(self.variable.opcua_ref['{}-target'.format(tool)].set_value(temperature_information[tool]['target']))
+
             #push to influx buffer
+            self.logger.debug("Adding tool {} to influx buffer".format(tool))
             data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
             self.variable.buffer_class.push_data(self.name,data_array)
 
@@ -248,7 +257,7 @@ class status_data(generic_data):
         #if new status
         if(status != self.variable.status):
             self.logger.debug("Status Changed")
-
+    
             #if new print
             if(status == "printing" and self.variable.status!="paused"):
                 self.logger.info("Print Starting")
@@ -285,20 +294,18 @@ class status_data(generic_data):
                     'status_message':status_text
                 }
 
-            if(status == "offline"):
-                self.variable.mtconnect.push_data("avail", "UNAVAILABLE")
-                self.variable.mtconnect.push_data("status","SETUP")
-            else:
-                self.variable.mtconnect.push_data("avail", "AVAILABLE")
-                self.variable.mtconnect.push_data("status","PRODUCTION")
 
             data_array = [get_now_str(),machine_dict['status'],machine_dict['status_message']]
             self.variable.buffer_class.push_data(self.name,data_array,width=3)
 
-            #update mtconnect
+            self.logger.debug("Logging MTConnect Status")
+
             if(status == 'offline'):
+
+                #update mtconnect
                 self.variable.mtconnect.push_data('avail',"UNAVAILABLE")
                 self.variable.mtconnect.push_data('status',"MAINTENANCE")
+
             else:
                 self.variable.mtconnect.push_data('avail',"AVAILABLE")
                 self.variable.mtconnect.push_data('status',"PRODUCTION")
@@ -306,7 +313,11 @@ class status_data(generic_data):
         else:
             self.logger.debug("Status unchanged")
         
-        
+        if(self.variable.opcua_ref is not None and "status" in self.variable.opcua_ref):
+            if(self.variable.opcua_ref["status"].get_value() != status):
+                self.logger.debug("Logging OPCUA Status")
+                asyncio.run(self.variable.opcua_ref["status"].set_value(status))
+                
         self.variable.status = status
 
     def format_influx_data(self,dictionary):

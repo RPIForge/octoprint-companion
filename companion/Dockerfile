@@ -8,8 +8,9 @@ RUN apt update
 RUN apt install -y --fix-missing pkg-config
 RUN apt install -y --fix-missing libhdf5-serial-dev libhdf5-dev python3-h5py
 
-RUN pip install --upgrade pip setuptools wheel
+RUN pip install pip setuptools wheel
 
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 COPY ./requirements.txt /companion/
 RUN pip install -r requirements.txt
 
