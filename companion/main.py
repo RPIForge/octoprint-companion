@@ -40,6 +40,11 @@ variable_instance.website_class = website_instance
 from mtconnect import MTConnect
 variable_instance.mtconnect = MTConnect(loc='config/device.xml')
 
+# initialize graphql
+from utils.graphql2smip import graphql2smip
+variable_instance.data_uploader=graphql2smip()
+
+
 #initalize flask endpoints
 from flask import Flask
 from utils.routes import endpoints
