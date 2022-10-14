@@ -4,7 +4,9 @@
 
 
 from utils.utils import get_now_str
+from utils.datasources import temperature_data
 from func_timeout import func_timeout, FunctionTimedOut
+from utils.graphql2smip import graphql2smip
 
 from datetime import datetime
 
@@ -50,6 +52,7 @@ def update_graphql_dataset(variable):
     return True
     
 def update_source_database(variable, source):
+    # source:  utils.datasources.temperature_data
     #lock db for reading and writting
     variable.buffer_class.acquire_lock("update_influx")
 
@@ -67,12 +70,14 @@ def update_source_database(variable, source):
 
 
     # get graphql_data
-    ##### ! TODO UPDATE .get_graphql_data (located in utils/datasources.py)
-    ##### ! This is a class specific function that parses the raw tool data into a graphql standard
-    graphql_data = source.get_graphql_data()
+    if isinstance(source, temperature_data):
+        graphql_data = source.get_graphql_data()
+        graphql_data = graphql_data.astype(str)
+        variable.logger_class.logger.info("************ pandas file is {}".format(graphql_data.to_string()))
+        #### ! Code push to graphql here and get result as bool (true for success | false for failure)
+        graphql_response=variable.data_uploader.write_smip(graphql_data, variable.logger_class.logger)
+        variable.logger_class.logger.info("************ smip upload is {}".format(graphql_response.to_string()))
     
-    #### ! Code push to graphql here and get result as bool (true for success | false for failure)
-    graphql_response
 
     #if data was succesfully uploaded clear out the dataset
     if(influx_response and graphql_response):
@@ -91,7 +96,7 @@ def update_databases(variable):
     time_data = {}
     all_uploaded = []
     error = False
-    for source in variable.datasources:
+    for source in variable.datasources:  # utils.datasources.temperature_data
        
         if(not source.influx):
             continue 

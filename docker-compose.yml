@@ -43,6 +43,15 @@ services:
       - FLASK_APP=main.py
       - LOG=INFO
       - OCTOPRINT_URL=http://octoprint:5000
+      
+      - SMIP_URL=https://rpi.cesmii.net/graphql
+      - SMIP_AUTH=ShuYang
+      - SMIP_ACCT=yangs18
+      - SMIP_ROLE=rpi_ro_group
+      - SMIP_PSWD=Admin123456
+      - SMIP_TRMP_ACTUAL_TAG_ID=24410
+      - SMIP_TRMP_SETPOINT_TAG_ID=24413
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health-check"]
       interval: 30s

@@ -43,6 +43,11 @@ variable_instance.mtconnect = mtconnect_adapter(variable_instance)
 from utils.connectors import start_opcua_adapter
 start_opcua_adapter(variable_instance)
 
+# initialize graphql
+from utils.graphql2smip import graphql2smip
+variable_instance.data_uploader=graphql2smip()
+
+
 #initalize flask endpoints
 from flask import Flask
 from utils.routes import endpoints

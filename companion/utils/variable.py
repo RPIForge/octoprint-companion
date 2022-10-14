@@ -36,6 +36,9 @@ class variable():
     job = None
     material = None
 
+    # graphql data uploader
+    data_uploader=None
+    
     #buffered data
     datasources = []
 
