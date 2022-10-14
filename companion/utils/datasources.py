@@ -4,7 +4,8 @@
 
 #util import
 from .utils import get_now_str
-
+import pandas as pd
+from datetime import datetime
 #timeout support
 from func_timeout import func_timeout, FunctionTimedOut
 import asyncio
@@ -98,7 +99,12 @@ class generic_data():
             output_array.append(parsed_data)
 
         return output_array
-   
+    
+    #! DO NOT IMPLEMENT HERE
+    #! Override this function in the specific classes bellow
+    def get_graphql_data(self, count=None):
+        raise Exception("get_graphql_data must be implemented")
+
     #
     # Data Deletion - functions used to delete data
     #
@@ -123,6 +129,13 @@ class temperature_data(generic_data):
         #get printer temperature
         octoprint = self.variable.octoprint_class
         temperature_information = octoprint.get_temperature()
+        """json:
+            "tool"{
+                "actual":214.88,
+                "target":220.0,
+                "offset":0
+            }
+        """
         if(not temperature_information):
             self.logger.error("Failed to get Temperature Information")
             return
@@ -180,6 +193,50 @@ class temperature_data(generic_data):
 
         return point
 
+    def get_graphql_data(self, count=None):
+        
+        data = self.get_raw_data(count)
+        
+        output_array = pd.DataFrame()
+        for measurement in data:
+            #process raw dsata
+            parsed_data = self.parse_h5py_data(measurement)
+
+            # self.logger.info("******** The parse data is {} ".format(str(parsed_data)))
+            # self.logger.info("******** The parse data type is {} ".format(type(parsed_data)))
+            # parsed data type is dict
+            # {'time': '2022-07-25 21:17:50 UTC', 'tool_name': 'tool0', 'actual': '21.3', 'goal': '0.0'}
+            #format data for influx
+            if (parsed_data["tool_name"]).find("tool")==-1:
+                continue
+            else:
+                formated_measurement = self.format_graphql_data(parsed_data)   
+                self.logger.info("******** The parse data is {} ".format(str(parsed_data)))
+                output_array=pd.concat([output_array, formated_measurement])
+            if(formated_measurement is None):
+                continue
+        return output_array
+
+    def format_graphql_data(self,parsed_data):
+        """format raw temperature data and format it into pandas dataframe
+
+        Args:
+            parsed_data (dict): parsed temperateure data {'time': '2022-07-25 21:17:50 UTC', 'tool_name': 'tool0', 'actual': '21.3', 'goal': '0.0'}
+
+        Returns:
+            formated_data (pandas df): formatted temperateure data in pandas format {'timestamp': '2022-07-25 21:17:50 UTC',  'actual': '21.3', 'goal': '0.0'}
+        """
+        self.logger.info("******** The time stamp data is ...")
+        timestamp=datetime.fromisoformat((parsed_data["time"]).replace(' UTC',''))
+        
+        timestamp=timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
+        d={'timestamp':[timestamp],'actual': [parsed_data["actual"]], 'goal': [parsed_data["goal"]]}
+        df = pd.DataFrame(data=d)
+        self.logger.info("******** The single temperature data is ...")
+        self.logger.info(df.to_string)
+        return df
+
+
 class location_data(generic_data):
     #
     # not in use as it requieres uploading to octoprint which voids powerloss recovery
@@ -233,6 +290,13 @@ class location_data(generic_data):
         }
 
         return self.variable.influx_class.generate_point(name,time,tags,fields)
+
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
 
 class status_data(generic_data):
     name = 'status_data'
@@ -344,4 +408,11 @@ class status_data(generic_data):
             parsed_data = self.parse_h5py_data(data[0])
 
         return parsed_data
+
+    def get_graphql_data(self, count=None):
+        #! IMPLEMENT YOUR DATA PARSING HERE HERE
+        raw_data = self.get_raw_data(count)
+
+
+        raise Exception("get_graphql_data must be implemented")
 
