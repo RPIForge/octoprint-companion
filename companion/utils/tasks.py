@@ -77,7 +77,8 @@ def update_source_database(variable, source):
         #### ! Code push to graphql here and get result as bool (true for success | false for failure)
         graphql_response=variable.data_uploader.write_smip(graphql_data, variable.logger_class.logger)
         variable.logger_class.logger.info("************ smip upload is {}".format(graphql_response.to_string()))
-    
+    else:
+        graphql_response=False
 
     #if data was succesfully uploaded clear out the dataset
     if(influx_response and graphql_response):
