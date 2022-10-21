@@ -9,6 +9,7 @@ from func_timeout import func_timeout, FunctionTimedOut
 from utils.graphql2smip import graphql2smip
 
 from datetime import datetime
+import traceback
 
 def get_end_time(variable):
     #log start of status
@@ -73,10 +74,10 @@ def update_source_database(variable, source):
     if isinstance(source, temperature_data):
         graphql_data = source.get_graphql_data()
         graphql_data = graphql_data.astype(str)
-        variable.logger_class.logger.info("************ pandas file is {}".format(graphql_data.to_string()))
+        variable.logger_class.logger.info("************ pandas file is {}".format(str(graphql_data)))
         #### ! Code push to graphql here and get result as bool (true for success | false for failure)
         graphql_response=variable.data_uploader.write_smip(graphql_data, variable.logger_class.logger)
-        variable.logger_class.logger.info("************ smip upload is {}".format(graphql_response.to_string()))
+        variable.logger_class.logger.info("************ smip upload is {}".format(str(graphql_response)))
     else:
         graphql_response=False
 
@@ -112,7 +113,10 @@ def update_databases(variable):
  
         except Exception as e:
             variable.logger_class.logger.error("Failed to update influxdb {}".format(source.name))
+            variable.logger_class.logger.error(traceback.format_exc())
             variable.logger_class.logger.error(e)
+
+            
 
             if(variable.buffer_class.lock_name != ''):
                 variable.logger_class.logger.error("{} has db lock".format(variable.buffer_class.lock_name))

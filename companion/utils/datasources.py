@@ -147,11 +147,11 @@ class temperature_data(generic_data):
         for tool in temperature_information:
             # Convert variables to floats or 0
             try:
-                target = float(temperature_information[tool]['target']
+                target = float(temperature_information[tool]['target'])
             except TypeError:
                 target = 0
             try:
-                actual = float(temperature_information[tool]['actual']
+                actual = float(temperature_information[tool]['actual'])
             except TypeError:
                 actual = 0
             
