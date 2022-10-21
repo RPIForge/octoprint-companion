@@ -8,6 +8,10 @@
 <Components>
 <Sensor id="temp-sensor" name="Temperature Sensor">
 <DataItems>
+<DataItem type="TEMPERATURE" id='A-temp' category="SAMPLE" name='Ambient Temperature' units="CELSIUS"/>
+<DataItem type="TEMPERATURE" id='A-target' category="SAMPLE" name='Ambient Temperature Target' units="CELSIUS"/>
+<DataItem type="TEMPERATURE" id='P-temp' category="SAMPLE" name='Probe Temperature' units="CELSIUS"/>
+<DataItem type="TEMPERATURE" id='P-target' category="SAMPLE" name='Probe Temperature Target' units="CELSIUS"/>
 <DataItem type="TEMPERATURE" id='tool0-temp' category="SAMPLE" name='Tool0 Temperature' units="CELSIUS"/>
 <DataItem type="TEMPERATURE" id='tool0-target' category="SAMPLE" name='Tool0 Temperature Target' units="CELSIUS"/>
 <DataItem type="TEMPERATURE" id='bed-temp' category="SAMPLE" name='Bed Temperature' units="CELSIUS"/>
