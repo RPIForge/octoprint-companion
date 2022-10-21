@@ -1,8 +1,10 @@
 #import mtconnect
 from mtconnect import MTConnect
+import os
 
 def mtconnect_adapter(variable_instance):
-    return MTConnect(loc='config/device.xml')
+    config_file = os.getenv('MTCONNECT_CONFIG',"config/prusa.xml")
+    return MTConnect(loc='config/prusa.xml')
 
 
 import asyncio
@@ -43,6 +45,16 @@ async def opcua_server(variable_instance):
     await bed_obj.set_modelling_rule(True)
     await (await bed_obj.add_variable(idx, "temp", -1.0, ua.VariantType.Double)).set_modelling_rule(True)
     await (await bed_obj.add_variable(idx, "target", -1.0, ua.VariantType.Double)).set_modelling_rule(True)   
+    
+    ambient_obj = await device_type.add_object(idx, "AmbientTemperature")
+    await ambient_obj.set_modelling_rule(True)
+    await (await ambient_obj.add_variable(idx, "temp", -1.0, ua.VariantType.Double)).set_modelling_rule(True)
+    await (await ambient_obj.add_variable(idx, "target", -1.0, ua.VariantType.Double)).set_modelling_rule(True)   
+    
+    probe_obj = await device_type.add_object(idx, "ProbeTemperature")
+    await probe_obj.set_modelling_rule(True)
+    await (await probe_obj.add_variable(idx, "temp", -1.0, ua.VariantType.Double)).set_modelling_rule(True)
+    await (await probe_obj.add_variable(idx, "target", -1.0, ua.VariantType.Double)).set_modelling_rule(True)   
 
     device = await server.nodes.objects.add_object(idx,variable_instance.name , device_type)
 

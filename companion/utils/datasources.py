@@ -145,20 +145,36 @@ class temperature_data(generic_data):
         #push data to the buffer
         time_str = get_now_str()
         for tool in temperature_information:
+            # Convert variables to floats or 0
+            try:
+                target = float(temperature_information[tool]['target']
+            except TypeError:
+                target = 0
+            try:
+                actual = float(temperature_information[tool]['actual']
+            except TypeError:
+                actual = 0
+            
             #push to mtconnect
             self.logger.debug("Updating MTConnect for tool {}".format(tool))
-            self.variable.mtconnect.push_data('{}-temp'.format(tool),temperature_information[tool]['actual'])
-            self.variable.mtconnect.push_data('{}-target'.format(tool),temperature_information[tool]['target'])
+            try:
+                self.variable.mtconnect.push_data('{}-temp'.format(tool),actual)
+                self.variable.mtconnect.push_data('{}-target'.format(tool),target)
+            except:
+                self.logger.error("Error Updating MTConnect for tool {}".format(tool))
 
             #push to opcua
             if(self.variable.opcua_ref is not None and "{}-temp".format(tool) in self.variable.opcua_ref):
                 self.logger.debug("Updating OPCUA for tool {}".format(tool))
-                asyncio.run(self.variable.opcua_ref['{}-temp'.format(tool)].set_value(temperature_information[tool]['actual']))
-                asyncio.run(self.variable.opcua_ref['{}-target'.format(tool)].set_value(temperature_information[tool]['target']))
+                try:
+                    asyncio.run(self.variable.opcua_ref['{}-temp'.format(tool)].set_value(actual))
+                    asyncio.run(self.variable.opcua_ref['{}-target'.format(tool)].set_value(target))   
+                except:
+                    self.logger.error("Error Updating OPCUA for tool {}".format(tool))
 
             #push to influx buffer
             self.logger.debug("Adding tool {} to influx buffer".format(tool))
-            data_array = [time_str,tool,temperature_information[tool]['actual'],temperature_information[tool]['target']]
+            data_array = [time_str,tool,actual,target]
             self.variable.buffer_class.push_data(self.name,data_array)
 
         
